@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#050505">
+  <meta name="description" content="KrackedDev HerStacks — a black & pink tech community landing page with the next live event, ambassador profile, and HerOps cybersec community.">
+  <link rel="icon" href="assets/favicon.png">
+  <title>KrackedDev // HerStacks</title>
+  <style>
+    :root{
+      --bg:#050505; --panel:#0b0b0f; --panel2:#111117; --pink:#ff39b8;
+      --pink2:#ff8bd8; --hot:#ff0fa8; --white:#f7f4f7; --muted:#9c98a2;
+      --line:rgba(255,57,184,.20); --burg:#8c123e; --burg2:#c72a68;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+      --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--white);font-family:var(--sans);overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.10;
+      background-image:linear-gradient(rgba(255,57,184,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,57,184,.12) 1px,transparent 1px);
+      background-size:44px 44px;mask-image:linear-gradient(to bottom,#000,transparent 75%);z-index:-2}
+    body:after{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 10%,rgba(255,57,184,.13),transparent 32%),radial-gradient(circle at 85% 60%,rgba(120,0,70,.12),transparent 28%);z-index:-3}
+    a{color:inherit;text-decoration:none}
+    .preloader{position:fixed;inset:0;background:#020202;display:grid;place-items:center;z-index:9999;transition:opacity .55s,visibility .55s}
+    .preloader.hide{opacity:0;visibility:hidden}
+    .loader-box{width:min(420px,82vw);font-family:var(--mono);font-size:12px;color:var(--pink2)}
+    .loader-logo{width:190px;display:block;margin:0 auto 25px;filter:drop-shadow(0 0 20px rgba(255,57,184,.45))}
+    .loader-line{height:2px;background:#1b1b1f;overflow:hidden}.loader-line i{display:block;width:0;height:100%;background:var(--pink);animation:load 1.6s ease forwards}
+    @keyframes load{to{width:100%}}
+    .loader-text{display:flex;justify-content:space-between;margin-top:10px;letter-spacing:.08em}
+    header{position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(5,5,5,.78);backdrop-filter:blur(16px)}
+    nav{max-width:1180px;margin:auto;padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:800;letter-spacing:.08em;font-size:13px}
+    .brand img{width:34px;height:34px;object-fit:contain}
+    .navlinks{display:flex;gap:22px;font-size:13px;color:#c6c1c9}.navlinks a:hover{color:var(--pink2)}
+    .pill{font-family:var(--mono);font-size:11px;border:1px solid var(--line);padding:8px 11px;border-radius:999px;color:var(--pink2)}
+    main{max-width:1180px;margin:auto;padding:0 22px}
+    .hero{min-height:82vh;display:grid;align-items:center;grid-template-columns:1.12fr .88fr;gap:50px;padding:75px 0 55px}
+    .eyebrow{font-family:var(--mono);color:var(--pink2);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+    h1{font-size:clamp(48px,8vw,92px);line-height:.92;margin:15px 0 22px;letter-spacing:-.065em}
+    .gradient{background:linear-gradient(120deg,#fff,var(--pink2) 45%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{font-size:17px;line-height:1.7;color:#b6b1ba;max-width:650px}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+    .btn{padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.12);font-family:var(--mono);font-size:12px;background:#101014}
+    .btn.primary{background:var(--pink);border-color:var(--pink);color:#090309;font-weight:800;box-shadow:0 0 30px rgba(255,57,184,.2)}
+    .btn:hover{transform:translateY(-1px)}
+    .hero-card{position:relative;border:1px solid var(--line);background:linear-gradient(145deg,rgba(255,57,184,.08),rgba(255,255,255,.02));border-radius:22px;padding:25px;box-shadow:0 25px 80px rgba(255,0,150,.09)}
+    .hero-card:before{content:"";position:absolute;inset:12px;border:1px dashed rgba(255,57,184,.15);border-radius:15px;pointer-events:none}
+    .hero-logo{display:block;width:min(100%,390px);margin:5px auto 12px;filter:drop-shadow(0 0 35px rgba(255,57,184,.32))}
+    .terminal{font-family:var(--mono);font-size:11px;color:#aaa4ae;line-height:1.9;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
+    .terminal b{color:var(--pink2)}
+    section{padding:80px 0}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:28px}
+    .section-head h2{font-size:clamp(30px,5vw,52px);margin:8px 0 0;letter-spacing:-.045em}
+    .section-head p{max-width:540px;color:var(--muted);line-height:1.7}
+    .event{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+    .event-card,.info-card,.ops-card{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:25px}
+    .event-card{border-color:var(--line);background:radial-gradient(circle at 80% 10%,rgba(255,57,184,.11),transparent 40%),var(--panel)}
+    .tag{display:inline-flex;gap:8px;align-items:center;font:11px var(--mono);color:var(--pink2);border:1px solid var(--line);padding:7px 9px;border-radius:999px}
+    .dot{width:7px;height:7px;background:var(--pink);border-radius:50%;box-shadow:0 0 12px var(--pink);animation:pulse 1.5s infinite}
+    @keyframes pulse{50%{opacity:.35}}
+    .event-title{font-size:28px;margin:20px 0 7px}.event-date{font-family:var(--mono);color:#aaa4ae;font-size:12px}
+    .countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:26px}
+    .timebox{background:#08080b;border:1px solid rgba(255,57,184,.16);border-radius:12px;text-align:center;padding:14px 5px}
+    .timebox strong{display:block;font:800 clamp(24px,4vw,38px) var(--mono);color:var(--pink2)}
+    .timebox span{font:9px var(--mono);color:#77727c;letter-spacing:.12em}
+    .status{margin-top:18px;color:#aaa4ae;font-size:13px}.status b{color:#ffb5e6}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .info-card h3,.ops-card h3{margin:0 0 10px;font-size:17px}.info-card p,.ops-card p{color:#a8a3ad;line-height:1.7;font-size:14px}
+    .meta{font:10px var(--mono);color:var(--pink2);letter-spacing:.12em;text-transform:uppercase;margin-bottom:13px}
+    .profile{display:grid;grid-template-columns:.8fr 1.2fr;gap:22px}
+    .profile-panel{border:1px solid rgba(255,57,184,.17);background:linear-gradient(135deg,rgba(255,57,184,.09),rgba(255,255,255,.015));border-radius:20px;padding:28px}
+    .profile-name{font-size:32px;font-weight:800;margin:5px 0}.profile-role{color:var(--pink2);font-family:var(--mono);font-size:12px}
+    .list{display:grid;gap:11px;margin-top:20px}.list div{border-left:2px solid var(--pink);padding:9px 12px;background:rgba(255,255,255,.025);font-size:13px;color:#bbb5be}
+    .ops{border-color:rgba(199,42,104,.38);background:radial-gradient(circle at 90% 0,rgba(140,18,62,.24),transparent 40%),var(--panel)}
+    .ops-logo{width:min(100%,330px);display:block;margin:10px auto 5px;filter:drop-shadow(0 0 25px rgba(199,42,104,.24))}
+    .ops .tag{color:#ff9bbd;border-color:rgba(199,42,104,.4)}
+    .ops-btn{display:inline-block;margin-top:10px;border:1px solid rgba(199,42,104,.6);background:rgba(140,18,62,.22);padding:11px 14px;border-radius:10px;font:11px var(--mono)}
+    .roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.step{padding:18px;border-top:2px solid var(--pink);background:rgba(255,255,255,.025);border-radius:0 0 12px 12px}.step b{font:11px var(--mono);color:var(--pink2)}.step h4{margin:10px 0 6px}.step p{margin:0;color:#8f8a93;font-size:12px;line-height:1.6}
+    footer{border-top:1px solid rgba(255,255,255,.07);padding:30px 22px;color:#6e6972;font:11px var(--mono)}
+    .footer-inner{max-width:1180px;margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    @media(max-width:850px){.hero,.event,.profile{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}.roadmap{grid-template-columns:1fr 1fr}.navlinks{display:none}}
+    @media(max-width:520px){main{padding:0 16px}.hero{padding-top:45px}.grid3,.roadmap{grid-template-columns:1fr}.countdown{gap:6px}.timebox{padding:12px 3px}.pill{display:none}}
+  </style>
+</head>
+<body>
+  <div class="preloader" id="preloader" aria-label="Loading">
+    <div class="loader-box">
+      <img class="loader-logo" src="assets/herstacks-logo.png" alt="HerStacks">
+      <div class="loader-line"><i></i></div>
+      <div class="loader-text"><span>KRACKEDDEV // BOOT</span><span id="loadPct">0%</span></div>
+    </div>
+  </div>
+
+  <header>
+    <nav>
+      <a class="brand" href="#top"><img src="assets/herstacks-logo.png" alt=""> KRACKEDDEV / HERSTACKS</a>
+      <div class="navlinks">
+        <a href="#live">Live</a><a href="#about">About</a><a href="#ambassador">Ambassador</a><a href="#herops">HerOps</a>
+      </div>
+      <span class="pill">SYSTEM: ONLINE</span>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">KRACKEDDEV // COMMUNITY NODE</div>
+        <h1>Build. Learn.<br><span class="gradient">Get HerStacked.</span></h1>
+        <p>A tech-forward home for HerStacks — with live learning, community building, ambassador activity and a dedicated path for members who want to explore cybersecurity through HerOps.</p>
+        <div class="actions">
+          <a class="btn primary" href="#live">VIEW NEXT LIVE EVENT</a>
+          <a class="btn" href="#herops">EXPLORE HEROPS →</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <img class="hero-logo" src="assets/herstacks-logo.png" alt="KrackedDev HerStacks pink logo">
+        <div class="terminal">
+          <div>&gt; <b>community.status</b> :: ONLINE</div>
+          <div>&gt; <b>whatsapp.group</b> :: BUILDING<span class="gradient">_</span></div>
+          <div>&gt; <b>next.event</b> :: 03 OCT 2026 / 21:00 MYT</div>
+          <div>&gt; <b>track</b> :: WEB × TECH × CYBER</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="live">
+      <div class="section-head">
+        <div><div class="eyebrow">01 // LIVE EVENT</div><h2>Next signal incoming.</h2></div>
+        <p>The countdown is locked to Malaysia Time (MYT, UTC+8) for the upcoming HerStacks live event.</p>
+      </div>
+      <div class="event">
+        <div class="event-card">
+          <span class="tag"><span class="dot"></span> UPCOMING LIVE</span>
+          <div class="event-title">HerStacks Live Session</div>
+          <div class="event-date">03 OCTOBER 2026 · 09:00 PM · MYT (UTC+8)</div>
+          <div class="countdown">
+            <div class="timebox"><strong id="days">--</strong><span>DAYS</span></div>
+            <div class="timebox"><strong id="hours">--</strong><span>HOURS</span></div>
+            <div class="timebox"><strong id="mins">--</strong><span>MINUTES</span></div>
+            <div class="timebox"><strong id="secs">--</strong><span>SECONDS</span></div>
+          </div>
+          <div class="status">Community build status: <b>WhatsApp group is currently being set up.</b></div>
+        </div>
+        <div class="info-card">
+          <div class="meta">EVENT MODULE</div>
+          <h3>What to expect</h3>
+          <p>Use this area for the final agenda, speaker details, meeting link and participation instructions when they are confirmed.</p>
+          <div class="list">
+            <div><b>01</b> — Live learning / community session</div>
+            <div><b>02</b> — HerStacks community updates</div>
+            <div><b>03</b> — Networking &amp; future activities</div>
+            <div><b>04</b> — WhatsApp community onboarding when ready</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="section-head">
+        <div><div class="eyebrow">02 // ABOUT</div><h2>The stack behind the community.</h2></div>
+        <p>HerStacks is presented here as a tech community layer around practical web development, digital creativity and community-led learning.</p>
+      </div>
+      <div class="grid3">
+        <article class="info-card"><div class="meta">WEB / BUILD</div><h3>Practical development</h3><p>Front-end, responsive web experiences and hands-on software development are part of the background behind this initiative.</p></article>
+        <article class="info-card"><div class="meta">COMMUNITY / CONNECT</div><h3>People first</h3><p>A dedicated WhatsApp group is currently being built to give members a direct place to connect once the setup is ready.</p></article>
+        <article class="info-card"><div class="meta">TECH / EXPLORE</div><h3>Multiple pathways</h3><p>HerStacks can grow across web, programming, design and adjacent technology tracks, while HerOps provides a cybersecurity-focused route.</p></article>
+      </div>
+    </section>
+
+    <section id="ambassador">
+      <div class="section-head">
+        <div><div class="eyebrow">03 // AMBASSADOR</div><h2>Background &amp; milestones.</h2></div>
+        <p>A compact profile layer for the HerStacks ambassador. Update the copy below as the official ambassador bio and community achievements are finalized.</p>
+      </div>
+      <div class="profile">
+        <div class="profile-panel">
+          <div class="meta">PROFILE NODE</div>
+          <div class="profile-name">Siti Nur Afiqah Nadzim</div>
+          <div class="profile-role">CTO — CherryBellmont · CFO — Nexaris Research Solutions</div>
+          <div class="list">
+            <div>IT professional with front-end and responsive web application experience.</div>
+            <div>Freelance web &amp; graphic designer with hands-on HTML, CSS, JavaScript, React and PHP work.</div>
+            <div>Currently pursuing a Bachelor of Computer Science (Hons.) with coursework spanning software development, web technologies, databases, networking and cybersecurity.</div>
+          </div>
+        </div>
+        <div class="profile-panel">
+          <div class="meta">ACHIEVEMENT LOG</div>
+          <div class="list">
+            <div><b>2021+</b> — Freelance web &amp; graphic design / responsive website work.</div>
+            <div><b>2023</b> — Web Application Development and PHP Programming training through MDEC / APU.</div>
+            <div><b>2023</b> — Low-Code Development using OutSystems Platform.</div>
+            <div><b>2025</b> — Structured Python development training completed.</div>
+            <div><b>ONGOING</b> — Bachelor of Computer Science (Hons.) and CS50 Web Programming with Python &amp; JavaScript.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="herops">
+      <div class="section-head">
+        <div><div class="eyebrow">04 // SIDE CHANNEL</div><h2>HerOps.</h2></div>
+        <p>A dedicated visual route for HerStacks members who are interested in cybersecurity.</p>
+      </div>
+      <div class="ops-card ops">
+        <img class="ops-logo" src="assets/herops-logo.png" alt="HerOps burgundy logo">
+        <div style="text-align:center">
+          <span class="tag">CYBERSECURITY INTEREST TRACK</span>
+          <h3 style="font-size:30px;margin:18px 0 8px">Curious about cybersec?</h3>
+          <p style="max-width:650px;margin:0 auto">HerOps is the promoted pathway for members interested in cybersecurity topics. Keep this area as the launch point for future sessions, learning resources, projects and community announcements.</p>
+          <a class="ops-btn" href="#live">RETURN TO HERSTACKS →</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div><div class="eyebrow">05 // BUILD STATUS</div><h2>From signal to community.</h2></div>
+        <p>Simple public-facing milestones that can be updated as the community develops.</p>
+      </div>
+      <div class="roadmap">
+        <div class="step"><b>01 / NOW</b><h4>Landing node</h4><p>HerStacks web presence is live with the next-event countdown.</p></div>
+        <div class="step"><b>02 / IN PROGRESS</b><h4>WhatsApp group</h4><p>Community group setup is ongoing.</p></div>
+        <div class="step"><b>03 / NEXT</b><h4>Live session</h4><p>03 Oct 2026 at 9:00 PM MYT.</p></div>
+        <div class="step"><b>04 / EXPAND</b><h4>HerOps</h4><p>Cybersecurity-focused activities can be added as they are confirmed.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>KRACKEDDEV // HERSTACKS</span>
+      <span>BLACK × PINK // TECH COMMUNITY UI</span>
+      <span>© <span id="year"></span></span>
+    </div>
+  </footer>
+
+  <script>
+    // Preloader
+    const loader = document.getElementById('preloader');
+    const pct = document.getElementById('loadPct');
+    let p = 0;
+    const tick = setInterval(() => {
+      p = Math.min(100, p + Math.ceil(Math.random()*14));
+      pct.textContent = p + '%';
+      if (p >= 100) clearInterval(tick);
+    }, 110);
+    window.addEventListener('load', () => setTimeout(() => loader.classList.add('hide'), 750));
+
+    // Countdown: 03 October 2026, 21:00 MYT (UTC+8)
+    const target = new Date('2026-10-03T21:00:00+08:00').getTime();
+    const els = {
+      d: document.getElementById('days'), h: document.getElementById('hours'),
+      m: document.getElementById('mins'), s: document.getElementById('secs')
+    };
+    function pad(n){ return String(Math.max(0,n)).padStart(2,'0'); }
+    function updateCountdown(){
+      const diff = target - Date.now();
+      if(diff <= 0){
+        els.d.textContent='00'; els.h.textContent='00'; els.m.textContent='00'; els.s.textContent='00';
+        return;
+      }
+      const total = Math.floor(diff/1000);
+      const days = Math.floor(total/86400);
+      const hours = Math.floor((total%86400)/3600);
+      const mins = Math.floor((total%3600)/60);
+      const secs = total%60;
+      els.d.textContent=pad(days); els.h.textContent=pad(hours); els.m.textContent=pad(mins); els.s.textContent=pad(secs);
+    }
+    updateCountdown(); setInterval(updateCountdown,1000);
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
