@@ -246,9 +246,23 @@
           else
           {feedback('auth-feedback','Success.');
            await refresh()}}catch(err){feedback('auth-feedback',err.message,true)}finally{b.disabled=false}};
-async function refresh(){try{const {data,error}=await supabase.auth.getUser();if(error)throw error;user=data.user;$('auth').classList.toggle('hidden',!!user);$('member').classList.toggle('hidden',!user);if(!user)return;$('member-email').textContent=user.email||'Member';await Promise.all([loadProfile(),loadHistory(),loadXp()])}catch(e){notice('Unable to verify your session: '+e.message)}}
-async function loadProfile(){const {data,error}=await supabase.from('profiles').select('display_name,bio').eq('id',user.id).maybeSingle();if(error){notice('Your profile cannot be loaded yet. Check profile RLS policies.');return}$('display-name').value=data?.display_name||'';$('bio').value=data?.bio||''}
-$('profile-form').onsubmit=async e=>{e.preventDefault();const b=$('save-profile');b.disabled=true;feedback('profile-feedback','Saving…');try{const {data:existing,error:readErr}=await supabase.from('profiles').select('id').eq('id',user.id).maybeSingle();if(readErr)throw readErr;const values={display_name:$('display-name').value.trim(),bio:$('bio').value.trim()};const query=existing?supabase.from('profiles').update(values).eq('id',user.id):supabase.from('profiles').insert({id:user.id,...values});const {error}=await query;if(error)throw error;feedback('profile-feedback','Profile saved.')}catch(err){feedback('profile-feedback','Save failed: '+err.message,true)}finally{b.disabled=false}};
+      async function refresh(){
+        try{
+          const {data,error}=await supabase.auth.getSession();
+          if(error)throw error;
+          user=data.user;
+          $('auth').classList.toggle('hidden',!!user);
+          $('member').classList.toggle('hidden',!user);
+          if(!user)return;
+          $('member-email').textContent=user.email||'Member';
+          await Promise.all([loadProfile(),loadHistory(),loadXp()])}
+        catch(e){
+          notice('Unable to verify your session: '+e.message)}}
+      async function loadProfile(){
+        const {data,error}=await supabase.from('profiles').select('display_name,bio').eq('id',user.id).maybeSingle();if(error){notice('Your profile cannot be loaded yet. Check profile RLS policies.');return}
+        $('display-name').value=data?.display_name||'';
+        $('bio').value=data?.bio||''}
+      $('profile-form').onsubmit=async e=>{e.preventDefault();const b=$('save-profile');b.disabled=true;feedback('profile-feedback','Saving…');try{const {data:existing,error:readErr}=await supabase.from('profiles').select('id').eq('id',user.id).maybeSingle();if(readErr)throw readErr;const values={display_name:$('display-name').value.trim(),bio:$('bio').value.trim()};const query=existing?supabase.from('profiles').update(values).eq('id',user.id):supabase.from('profiles').insert({id:user.id,...values});const {error}=await query;if(error)throw error;feedback('profile-feedback','Profile saved.')}catch(err){feedback('profile-feedback','Save failed: '+err.message,true)}finally{b.disabled=false}};
 async function loadHistory(){const box=$('history');const {data,error}=await supabase.from('activity_completions').select('activity_id,status,submitted_at').eq('user_id',user.id).order('submitted_at',{ascending:false});if(error){box.textContent='Submission history unavailable until database permissions are configured.';$('member-submissions').textContent='—';return}const items=data||[];$('member-submissions').textContent=items.length;box.replaceChildren();if(!items.length){box.textContent='No submissions yet.';return}for(const item of items){const line=document.createElement('div');line.className='history-item';const left=document.createElement('span');left.textContent='Activity '+item.activity_id.slice(0,8)+'…';const right=document.createElement('span');right.className='status-pill';right.textContent=item.status||'pending';line.append(left,right);box.append(line)}}
 async function loadXp(){const {data,error}=await supabase.from('xp_transactions').select('points').eq('user_id',user.id);$('member-xp').textContent=error?'—':(data||[]).reduce((sum,x)=>sum+Number(x.points||0),0)}
 $('logout').onclick=async()=>{try{const {error}=await supabase.auth.signOut();if(error)throw error;user=null;notice('');await refresh()}catch(e){notice('Sign out failed: '+e.message)}};supabase.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});refresh();</script></body></html>
