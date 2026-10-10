@@ -197,13 +197,55 @@
           </section>
           <section class="panel">
             <h2>My activity</h2>
-            <div id="history" class="small">Loading your submissions…</div><div style="margin-top:24px"><a class="btn secondary" href="./activities.html">BROWSE ACTIVITIES</a></div></section></div><button id="logout" class="btn burg" type="button">SIGN OUT</button></section></main><footer><div class="wrap foot"><span>KRACKEDDEV // HERSTACKS</span><span>BUILD · LEARN · CONTRIBUTE</span></div></footer><script type="module">import { supabase } from './supabase-client.js';
-const $=id=>document.getElementById(id);let mode='login',user=null;
-function feedback(id,message,error=false){const n=$(id);n.textContent=message;n.className='feedback '+(error?'error':'ok')}
-function notice(message){$('notice').hidden=!message;$('notice').textContent=message||''}
-function setMode(m){mode=m;$('login-tab').classList.toggle('active',m==='login');$('signup-tab').classList.toggle('active',m==='signup');$('auth-title').textContent=m==='login'?'Welcome back.':'Join HerStacks.';$('auth-button').textContent=m==='login'?'SIGN IN':'CREATE ACCOUNT';$('password').autocomplete=m==='login'?'current-password':'new-password';feedback('auth-feedback','')}
-$('login-tab').onclick=()=>setMode('login');$('signup-tab').onclick=()=>setMode('signup');
-$('auth-form').onsubmit=async e=>{e.preventDefault();const b=$('auth-button');b.disabled=true;feedback('auth-feedback','Please wait…');try{const email=$('email').value.trim(),password=$('password').value;const {data,error}=mode==='login'?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password});if(error)throw error;if(mode==='signup'&&!data.session){feedback('auth-feedback','Account created. Check your email for a confirmation link, then sign in.')}else{feedback('auth-feedback','Success.');await refresh()}}catch(err){feedback('auth-feedback',err.message,true)}finally{b.disabled=false}};
+            <div id="history" class="small">Loading your submissions…</div>
+            <div style="margin-top:24px">
+              <a class="btn secondary" href="./activities.html">BROWSE ACTIVITIES</a>
+            </div>
+          </section>
+        </div>
+        <button id="logout" class="btn burg" type="button">SIGN OUT</button>
+      </section>
+    </main>
+    <footer>
+      <div class="wrap foot">
+        <span>KRACKEDDEV // HERSTACKS</span>
+        <span>BUILD · LEARN · CONTRIBUTE</span>
+      </div>
+    </footer>
+    <script type="module">import { supabase } from './supabase-client.js';
+      const $=id=>document.getElementById(id);
+      let mode='login',user=null;
+      function feedback(id,message,error=false){
+        const n=$(id);
+        n.textContent=message;
+        n.className='feedback '+(error?'error':'ok')
+      }
+      function notice(message){
+        $('notice').hidden=!message;
+        $('notice').textContent=message||''
+      }
+      function setMode(m){
+        mode=m;
+        $('login-tab').classList.toggle('active',m==='login');
+        $('signup-tab').classList.toggle('active',m==='signup');
+        $('auth-title').textContent=m==='login'?'Welcome back.':'Join HerStacks.';
+        $('auth-button').textContent=m==='login'?'SIGN IN':'CREATE ACCOUNT';
+        $('password').autocomplete=m==='login'?'current-password':'new-password';feedback('auth-feedback','')
+      }
+      $('login-tab').onclick=()=>setMode('login');
+      $('signup-tab').onclick=()=>setMode('signup');
+      $('auth-form').onsubmit=async e=>{
+        e.preventDefault();
+        const b=$('auth-button');
+        b.disabled=true;feedback('auth-feedback','Please wait…');
+        try{
+          const email=$('email').value.trim(),password=$('password').value;
+          const {data,error}=mode==='login'?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password});
+          if(error)throw error;
+          if(mode==='signup'&&!data.session){feedback('auth-feedback','Account created. Check your email for a confirmation link, then sign in.')}
+          else
+          {feedback('auth-feedback','Success.');
+           await refresh()}}catch(err){feedback('auth-feedback',err.message,true)}finally{b.disabled=false}};
 async function refresh(){try{const {data,error}=await supabase.auth.getUser();if(error)throw error;user=data.user;$('auth').classList.toggle('hidden',!!user);$('member').classList.toggle('hidden',!user);if(!user)return;$('member-email').textContent=user.email||'Member';await Promise.all([loadProfile(),loadHistory(),loadXp()])}catch(e){notice('Unable to verify your session: '+e.message)}}
 async function loadProfile(){const {data,error}=await supabase.from('profiles').select('display_name,bio').eq('id',user.id).maybeSingle();if(error){notice('Your profile cannot be loaded yet. Check profile RLS policies.');return}$('display-name').value=data?.display_name||'';$('bio').value=data?.bio||''}
 $('profile-form').onsubmit=async e=>{e.preventDefault();const b=$('save-profile');b.disabled=true;feedback('profile-feedback','Saving…');try{const {data:existing,error:readErr}=await supabase.from('profiles').select('id').eq('id',user.id).maybeSingle();if(readErr)throw readErr;const values={display_name:$('display-name').value.trim(),bio:$('bio').value.trim()};const query=existing?supabase.from('profiles').update(values).eq('id',user.id):supabase.from('profiles').insert({id:user.id,...values});const {error}=await query;if(error)throw error;feedback('profile-feedback','Profile saved.')}catch(err){feedback('profile-feedback','Save failed: '+err.message,true)}finally{b.disabled=false}};
