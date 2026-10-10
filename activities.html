@@ -1,11 +1,111 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080808"><title>Activities | KD HerStacks</title><link rel="icon" href="./favicon.png"><link rel="stylesheet" href="./styles.css"><style>
-.dashboard{padding:75px 0 100px;min-height:calc(100vh - 150px)}.dash-top{border-bottom:1px solid var(--line);padding-bottom:36px;margin-bottom:32px}.dash-top h1{font-size:clamp(3.1rem,8vw,6.5rem);margin:15px 0 22px}.dash-top h1 span{color:var(--pink)}.dash-top p{max-width:650px;color:var(--muted)}.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}.stat,.panel,.activity{background:var(--panel);border:1px solid var(--line);padding:24px}.stat small,.eyebrow,.meta{font:700 11px/1.5 monospace;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}.stat strong{display:block;font:800 2rem monospace;color:var(--pink);margin-top:12px}.panel{margin-bottom:18px}.panel h2{font-size:1.8rem;letter-spacing:-.02em;margin-bottom:20px}.panel p,.activity p{color:var(--muted)}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}.toolbar button,.tab{background:#111;border:1px solid #41333d;color:#f5eaf1;padding:12px 16px;font:700 11px monospace;cursor:pointer}.toolbar button.active,.tab.active{background:var(--pink);color:#080808;border-color:var(--pink)}.activity-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.activity{display:flex;flex-direction:column;gap:15px}.activity h3{line-height:1.1;font-size:1.6rem}.activity-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.xp{color:var(--pink);font:800 13px monospace}.activity-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;flex-wrap:wrap}.status-pill{border:1px solid #4b3442;padding:6px 9px;color:var(--pink);font:700 10px monospace;text-transform:uppercase}.notice-box{padding:17px;border:1px solid #674354;background:#190d14;color:#f6b4d5;margin-bottom:22px;font-size:.92rem}.notice-box[hidden],.hidden{display:none!important}form{display:grid;gap:14px}.field{display:grid;gap:7px}.field label{font:700 11px monospace;text-transform:uppercase;color:#cbbdc5}.field input,.field textarea{width:100%;border:1px solid #45353f;background:#090909;color:white;padding:14px;font:inherit;border-radius:0}.field textarea{min-height:110px;resize:vertical}.field input:focus,.field textarea:focus{outline:1px solid var(--pink)}button:disabled{opacity:.5;cursor:not-allowed}.form-actions{display:flex;flex-wrap:wrap;gap:10px}.muted{color:var(--muted)}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}.small{font-size:.85rem}.nav-extra{display:flex;gap:18px;align-items:center}.nav-extra a{font:700 11px monospace;color:var(--pink)}.feedback{min-height:22px;font-size:.9rem}.feedback.error{color:#ff9caa}.feedback.ok{color:#ff91d2}.history-item{padding:16px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.history-item:last-child{border:0}.history-item strong{display:block}.auth-switch{display:flex;gap:8px;margin-bottom:22px}@media(max-width:760px){.activity-list,.two-col{grid-template-columns:1fr}.dash-grid{grid-template-columns:1fr 1fr}.dashboard{padding-top:45px}.nav-extra{gap:9px}.brand img{width:110px}}@media(max-width:450px){.dash-grid{grid-template-columns:1fr}.stat{padding:18px}}
-</style></head><body><header class="site-header"><div class="wrap nav"><a class="brand" href="./index.html" aria-label="HerStacks home"><img src="./herstacks-logo.png" alt="KD HerStacks"></a><nav class="nav-extra" aria-label="Dashboard navigation"><a href="./index.html">HOME</a><a href="./activities.html">ACTIVITIES</a><a href="./account.html">ACCOUNT</a></nav></div></header><main class="wrap dashboard"><section class="dash-top"><div class="kicker">HERSTACKS / MEMBER MISSIONS</div><h1>ACTIVITY<span>BOARD.</span></h1><p>Explore community missions, learn new skills, and submit your work. XP is awarded only after an authorized review.</p></section><div class="dash-grid"><div class="stat"><small>Published missions</small><strong id="total">—</strong></div><div class="stat"><small>My submissions</small><strong id="submitted">—</strong></div><div class="stat"><small>Available XP</small><strong id="xp">—</strong></div></div><div id="notice" class="notice-box" role="status" hidden></div><div class="toolbar" aria-label="Activity filters"><button data-filter="all" class="active">ALL</button><button data-filter="open">OPEN</button><button data-filter="submitted">SUBMITTED</button></div><div id="activity-list" class="activity-list" aria-live="polite"><div class="panel">Loading activities…</div></div><section id="submit-panel" class="panel hidden" aria-labelledby="submit-title"><h2 id="submit-title">Submit activity</h2><p id="selected-name" class="small" style="margin-bottom:16px"></p><form id="submission-form"><div class="field"><label for="submission">Submission link or explanation</label><textarea id="submission" maxlength="3000" required placeholder="Share your work, repository link, or a short explanation"></textarea></div><div class="form-actions"><button class="btn" id="send" type="submit">SUBMIT FOR REVIEW</button><button class="btn secondary" type="button" id="cancel">CANCEL</button></div><p class="feedback" id="submission-feedback" role="status"></p></form></section></main><footer><div class="wrap foot"><span>KRACKEDDEV // HERSTACKS</span><span>BUILD · LEARN · CONTRIBUTE</span></div></footer><script type="module">import { supabase } from './supabase-client.js';
-const $=id=>document.getElementById(id), state={activities:[],completions:[],user:null,filter:'all',selected:null};
-function notice(message){$('notice').hidden=!message;$('notice').textContent=message||''}
-function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n}
-function date(s){return s?new Date(s).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}):'No deadline'}
-function active(a){return !a.ends_at||new Date(a.ends_at)>new Date()}
-function render(){const a=state.activities,done=new Map(state.completions.map(c=>[c.activity_id,c]));$('total').textContent=a.length;$('submitted').textContent=state.user?done.size:'—';$('xp').textContent=a.reduce((s,x)=>s+(Number(x.xp_reward)||0),0);const list=$('activity-list');list.replaceChildren();let items=a.filter(x=>state.filter==='all'||(state.filter==='open'&&active(x)&&!done.has(x.id))||(state.filter==='submitted'&&done.has(x.id)));if(!items.length){list.append(el('div','panel',a.length?'No activities match this filter.':'No published activities yet. Check back soon.'));return}for(const x of items){const c=done.get(x.id),card=el('article','activity'),head=el('div','activity-head');head.append(el('span','eyebrow',x.category||'COMMUNITY'),el('span','xp',`+${x.xp_reward||0} XP`));card.append(head,el('h3','',x.title),el('p','',x.description||'Details will be shared by the HerStacks team.'));const foot=el('div','activity-footer');foot.append(el('span','meta',x.ends_at?`ENDS ${date(x.ends_at)}`:'NO DEADLINE'));if(c){foot.append(el('span','status-pill',c.status||'pending'))}else if(!active(x)){foot.append(el('span','status-pill','Closed'))}else{const b=el('button','btn secondary',state.user?'SUBMIT WORK':'LOGIN TO SUBMIT');b.type='button';b.onclick=()=>{if(!state.user){location.href='./account.html';return}state.selected=x;$('selected-name').textContent=x.title;$('submission').value='';$('submission-feedback').textContent='';$('submit-panel').classList.remove('hidden');$('submit-panel').scrollIntoView({behavior:'smooth',block:'start'})};foot.append(b)}card.append(foot);list.append(card)}}
-async function load(){try{const {data:{user},error:authErr}=await supabase.auth.getUser();if(authErr)throw authErr;state.user=user;const {data,error}=await supabase.from('activities').select('id,title,description,category,xp_reward,ends_at,is_published').eq('is_published',true).order('created_at',{ascending:false});if(error)throw error;state.activities=data||[];if(user){const result=await supabase.from('activity_completions').select('activity_id,status').eq('user_id',user.id);if(result.error)notice('Activities loaded, but your submissions cannot be accessed yet. Database permissions may need configuration.');else state.completions=result.data||[]}render()}catch(e){state.activities=[];render();notice('Could not load activities: '+e.message+'. Check the Supabase connection and RLS policies.')}}
-document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{state.filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()}));$('cancel').onclick=()=>$('submit-panel').classList.add('hidden');$('submission-form').onsubmit=async e=>{e.preventDefault();if(!state.user||!state.selected)return;const button=$('send'),feedback=$('submission-feedback');button.disabled=true;feedback.textContent='Submitting…';feedback.className='feedback';try{const {error}=await supabase.from('activity_completions').insert({activity_id:state.selected.id,user_id:state.user.id,submission:$('submission').value.trim(),status:'pending'});if(error)throw error;feedback.textContent='Submitted for review. XP is not awarded until approved.';feedback.classList.add('ok');state.completions.push({activity_id:state.selected.id,status:'pending'});render();setTimeout(()=>{$('submit-panel').classList.add('hidden')},1800)}catch(err){feedback.textContent='Submission failed: '+err.message;feedback.classList.add('error')}finally{button.disabled=false}};load();</script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#080808">
+    <title>Activities | KD HerStacks</title>
+    <link rel="icon" href="./favicon.png">
+    <link rel="stylesheet" href="./styles.css">
+    <style>.dashboard{padding:75px 0 100px;min-height:calc(100vh - 150px)}.dash-top{border-bottom:1px solid var(--line);padding-bottom:36px;margin-bottom:32px}.dash-top h1{font-size:clamp(3.1rem,8vw,6.5rem);margin:15px 0 22px}.dash-top h1 span{color:var(--pink)}.dash-top p{max-width:650px;color:var(--muted)}.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}.stat,.panel,.activity{background:var(--panel);border:1px solid var(--line);padding:24px}.stat small,.eyebrow,.meta{font:700 11px/1.5 monospace;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}.stat strong{display:block;font:800 2rem monospace;color:var(--pink);margin-top:12px}.panel{margin-bottom:18px}.panel h2{font-size:1.8rem;letter-spacing:-.02em;margin-bottom:20px}.panel p,.activity p{color:var(--muted)}.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}.toolbar button,.tab{background:#111;border:1px solid #41333d;color:#f5eaf1;padding:12px 16px;font:700 11px monospace;cursor:pointer}.toolbar button.active,.tab.active{background:var(--pink);color:#080808;border-color:var(--pink)}.activity-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.activity{display:flex;flex-direction:column;gap:15px}.activity h3{line-height:1.1;font-size:1.6rem}.activity-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.xp{color:var(--pink);font:800 13px monospace}.activity-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;flex-wrap:wrap}.status-pill{border:1px solid #4b3442;padding:6px 9px;color:var(--pink);font:700 10px monospace;text-transform:uppercase}.notice-box{padding:17px;border:1px solid #674354;background:#190d14;color:#f6b4d5;margin-bottom:22px;font-size:.92rem}.notice-box[hidden],.hidden{display:none!important}form{display:grid;gap:14px}.field{display:grid;gap:7px}.field label{font:700 11px monospace;text-transform:uppercase;color:#cbbdc5}.field input,.field textarea{width:100%;border:1px solid #45353f;background:#090909;color:white;padding:14px;font:inherit;border-radius:0}.field textarea{min-height:110px;resize:vertical}.field input:focus,.field textarea:focus{outline:1px solid var(--pink)}button:disabled{opacity:.5;cursor:not-allowed}.form-actions{display:flex;flex-wrap:wrap;gap:10px}.muted{color:var(--muted)}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}.small{font-size:.85rem}.nav-extra{display:flex;gap:18px;align-items:center}.nav-extra a{font:700 11px monospace;color:var(--pink)}.feedback{min-height:22px;font-size:.9rem}.feedback.error{color:#ff9caa}.feedback.ok{color:#ff91d2}.history-item{padding:16px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.history-item:last-child{border:0}.history-item strong{display:block}.auth-switch{display:flex;gap:8px;margin-bottom:22px}@media(max-width:760px){.activity-list,.two-col{grid-template-columns:1fr}.dash-grid{grid-template-columns:1fr 1fr}.dashboard{padding-top:45px}.nav-extra{gap:9px}.brand img{width:110px}}@media(max-width:450px){.dash-grid{grid-template-columns:1fr}.stat{padding:18px}}</style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap nav">
+        <a class="brand" href="./index.html" aria-label="HerStacks home">
+          <img src="./herstacks-logo.png" alt="KD HerStacks">
+        </a>
+        <nav class="nav-extra" aria-label="Dashboard navigation">
+          <a href="./index.html">HOME</a>
+          <a href="./activities.html">ACTIVITIES</a>
+          <a href="./account.html">ACCOUNT</a>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap dashboard">
+      <section class="dash-top">
+        <div class="kicker">HERSTACKS / MEMBER MISSIONS</div>
+        <h1>ACTIVITY<span>BOARD.</span></h1>
+        <p>Explore community missions, learn new skills, and submit your work. XP is awarded only after an authorized review.</p>
+      </section>
+      <div class="dash-grid">
+        <div class="stat">
+          <small>Published missions</small>
+          <strong id="total">—</strong>
+        </div>
+        <div class="stat">
+          <small>My submissions</small>
+          <strong id="submitted">—</strong>
+        </div>
+        <div class="stat">
+          <small>Available XP</small>
+          <strong id="xp">—</strong>
+        </div>
+      </div>
+      <div id="notice" class="notice-box" role="status" hidden></div>
+      <div class="toolbar" aria-label="Activity filters">
+        <button data-filter="all" class="active">ALL</button>
+        <button data-filter="open">OPEN</button>
+        <button data-filter="submitted">SUBMITTED</button>
+      </div>
+      <div id="activity-list" class="activity-list" aria-live="polite">
+        <div class="panel">Loading activities…</div>
+      </div>
+      <section id="submit-panel" class="panel hidden" aria-labelledby="submit-title">
+        <h2 id="submit-title">Submit activity</h2>
+        <p id="selected-name" class="small" style="margin-bottom:16px"></p>
+        <form id="submission-form">
+          <div class="field">
+            <label for="submission">Submission link or explanation</label>
+            <textarea id="submission" maxlength="3000" required placeholder="Share your work, repository link, or a short explanation"></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn" id="send" type="submit">SUBMIT FOR REVIEW</button>
+            <button class="btn secondary" type="button" id="cancel">CANCEL</button>
+          </div>
+          <p class="feedback" id="submission-feedback" role="status"></p>
+        </form>
+      </section>
+    </main>
+    <footer>
+      <div class="wrap foot">
+        <span>KRACKEDDEV // HERSTACKS</span>
+        <span>BUILD · LEARN · CONTRIBUTE</span>
+      </div>
+    </footer>
+    <script type="module">
+      import { supabase } from './supabase-client.js';
+      const $=id=>
+        document.getElementById(id), 
+        state={activities:[],
+               completions:[],user:null,
+               filter:'all',
+               selected:null};
+      function notice(message){
+        $('notice').hidden=!message;
+        $('notice').textContent=message||''
+      }
+      function el(tag,cls,text){
+        const n=document.createElement(tag);
+        if(cls)n.className=cls;
+        if(text!==undefined)n.textContent=text;
+        return n}
+      function date(s){
+        return s?new Date(s).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}):'No deadline'}
+      function active(a){
+        return !a.ends_at||new Date(a.ends_at)>new Date()}
+      function render(){
+        const a=state.activities,done=new Map(state.completions.map(c=>[c.activity_id,c]));
+        $('total').textContent=a.length;
+        $('submitted').textContent=state.user?done.size:'—';
+        $('xp').textContent=a.reduce((s,x)=>s+(Number(x.xp_reward)||0),0);
+        const list=$('activity-list');
+        list.replaceChildren();let items=a.filter(x=>state.filter==='all'||(state.filter==='open'&&active(x)&&!done.has(x.id))||(state.filter==='submitted'&&done.has(x.id)));if(!items.length){list.append(el('div','panel',a.length?'No activities match this filter.':'No published activities yet. Check back soon.'));return}for(const x of items){const c=done.get(x.id),card=el('article','activity'),head=el('div','activity-head');head.append(el('span','eyebrow',x.category||'COMMUNITY'),el('span','xp',`+${x.xp_reward||0} XP`));card.append(head,el('h3','',x.title),el('p','',x.description||'Details will be shared by the HerStacks team.'));const foot=el('div','activity-footer');foot.append(el('span','meta',x.ends_at?`ENDS ${date(x.ends_at)}`:'NO DEADLINE'));if(c){foot.append(el('span','status-pill',c.status||'pending'))}else if(!active(x)){foot.append(el('span','status-pill','Closed'))}else{const b=el('button','btn secondary',state.user?'SUBMIT WORK':'LOGIN TO SUBMIT');b.type='button';b.onclick=()=>{if(!state.user){location.href='./account.html';return}state.selected=x;$('selected-name').textContent=x.title;$('submission').value='';$('submission-feedback').textContent='';$('submit-panel').classList.remove('hidden');$('submit-panel').scrollIntoView({behavior:'smooth',block:'start'})};foot.append(b)}card.append(foot);list.append(card)}}
+      async function load(){
+        try{
+          const { data, error: authErr } = await supabase.auth.getSession();
+          if (authErr) throw authErr;
+          const user = data.session?.user ?? null;
+          state.user = user;
+          const {data,error}=await supabase.from('activities').select('id,title,description,category,xp_reward,ends_at,is_published').eq('is_published',true).order('created_at',{ascending:false});if(error)throw error;state.activities=data||[];if(user){const result=await supabase.from('activity_completions').select('activity_id,status').eq('user_id',user.id);if(result.error)notice('Activities loaded, but your submissions cannot be accessed yet. Database permissions may need configuration.');else state.completions=result.data||[]}render()}catch(e){state.activities=[];render();notice('Could not load activities: '+e.message+'. Check the Supabase connection and RLS policies.')};
+      document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{state.filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()}));$('cancel').onclick=()=>$('submit-panel').classList.add('hidden');$('submission-form').onsubmit=async e=>{e.preventDefault();if(!state.user||!state.selected)return;const button=$('send'),feedback=$('submission-feedback');button.disabled=true;feedback.textContent='Submitting…';feedback.className='feedback';try{const {error}=await supabase.from('activity_completions').insert({activity_id:state.selected.id,user_id:state.user.id,submission:$('submission').value.trim(),status:'pending'});if(error)throw error;feedback.textContent='Submitted for review. XP is not awarded until approved.';feedback.classList.add('ok');state.completions.push({activity_id:state.selected.id,status:'pending'});render();setTimeout(()=>{$('submit-panel').classList.add('hidden')},1800)}catch(err){feedback.textContent='Submission failed: '+err.message;feedback.classList.add('error')}finally{button.disabled=false}};load();</script></body></html>
