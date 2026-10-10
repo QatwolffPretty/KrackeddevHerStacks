@@ -1,5 +1,5 @@
 
-import { supabase } from "supabase-client.js";
+import { supabase } from "./supabase-client.js";
 
 // HerStacks frontend backend helpers
 const HerStacksBackend = {
