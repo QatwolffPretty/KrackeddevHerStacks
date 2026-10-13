@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080808">
+  <meta name="description" content="HerStacks CyberLabs — choose your tech learning path.">
+  <title>CyberLabs | KD HerStacks</title>
+  <link rel="icon" href="./favicon.png">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./cyberlabs.css">
+  <script type="module" src="./cyberlabs.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="brand" href="./index.html"><img src="./herstacks-logo.png" alt="HerStacks"></a>
+      <div class="nav-links"><a href="./index.html">Home</a><a href="./activities.html">Activities</a><a href="./account.html">Account</a></div>
+    </nav>
+  </header>
+
+  <main class="wrap lab-page">
+    <div class="num">KRACKEDDEV / HERSTACKS / LEARNING HUB</div>
+    <div class="lab-hero">
+      <div>
+        <h1>CYBER<span>LABS.</span></h1>
+        <p>Choose your direction. Learn the fundamentals. Build real skills through structured lessons and practical exercises.</p>
+      </div>
+      <div class="lab-hero-mark" aria-hidden="true">// 01</div>
+    </div>
+
+    <div id="lab-auth" class="lab-notice" role="status" aria-live="polite">Checking member session…</div>
+    <section id="lab-onboarding" class="lab-section" hidden aria-labelledby="lab-onboarding-title">
+      <div class="lab-section-heading"><div><div class="num">STEP 01 / PERSONALIZE</div><h2 id="lab-onboarding-title">WHAT DO YOU WANT TO LEARN?</h2></div></div>
+      <p class="lab-muted">Select one or both tracks. You can change your selection later.</p>
+      <form id="lab-interest-form">
+        <div class="lab-track-grid">
+          <label class="lab-choice"><input type="checkbox" name="interest" value="herops"><span class="lab-choice-content"><span class="lab-kicker">TRACK 01 / SECURITY</span><strong>CYBERSECURITY / HEROPS</strong><span>Digital safety, OSINT, social engineering, networking and ethical security labs.</span></span></label>
+          <label class="lab-choice"><input type="checkbox" name="interest" value="vibecoding"><span class="lab-choice-content"><span class="lab-kicker">TRACK 02 / BUILD</span><strong>VIBE CODING & AI DEVELOPMENT</strong><span>Prompting, websites, AI-assisted coding, GitHub and product building.</span></span></label>
+        </div>
+        <div class="lab-form-actions"><button type="submit" class="lab-button" id="lab-save" disabled>SAVE MY LEARNING PATH →</button><span id="lab-save-status" class="lab-muted" role="status"></span></div>
+      </form>
+    </section>
+
+    <section id="lab-dashboard" class="lab-section" hidden aria-labelledby="lab-dashboard-title">
+      <div class="lab-section-heading"><div><div class="num">YOUR LEARNING SPACE</div><h2 id="lab-dashboard-title">MY LEARNING PATHS</h2></div><button type="button" class="lab-button lab-button-outline" id="lab-edit">EDIT INTERESTS</button></div>
+      <div class="lab-stats"><div><span>ENROLLED TRACKS</span><strong id="lab-track-count">0</strong></div><div><span>AVAILABLE MODULES</span><strong id="lab-module-count">0</strong></div><div><span>LEARNING PROGRESS</span><strong>COMING SOON</strong></div></div>
+      <div id="lab-paths" class="lab-paths"></div>
+    </section>
+
+    <section class="lab-section" aria-labelledby="lab-about-title"><div class="num">HOW IT WORKS</div><h2 id="lab-about-title">LEARN → PRACTICE → APPLY</h2><p class="lab-muted">Each track follows an ordered curriculum. Lessons, quizzes, practical exercises and verified progress tracking will be released in stages. Your existing member account remains the same.</p></section>
+  </main>
+  <footer><div class="wrap foot"><span>KRACKEDDEV / HERSTACKS</span><span>LEARN · BUILD · DEFEND</span></div></footer>
+</body>
+</html>
