@@ -99,9 +99,16 @@ function renderLesson() {
     try {
       const { error } = await supabase.from('herops_lesson_progress').upsert({ user_id: user.id, lesson_id: lessonId(m, l) }, { onConflict: 'user_id,lesson_id' });
       if (error) throw error;
+      
       completed.add(lessonId(m, l));
       refreshProgress();
       renderNavigation();
+
+// Check whether all 24 lessons are now completed
+      if (completed.size === 24) {
+        await checkHerOpsCourseReward();
+      }
+
       feedback.textContent = `Completed ✓ ${explanation}`;
       const next = l < 2 ? [m, l + 1] : m < 7 ? [m + 1, 0] : null;
       if (next) target.append(button('NEXT LESSON →', () => { activeModule = next[0]; activeLesson = next[1]; questionChoice = -1; render(); }));
@@ -117,6 +124,45 @@ function renderLesson() {
   feedback.setAttribute('aria-live', 'polite');
   target.append(feedback);
 }
+
+
+async function checkHerOpsCourseReward() {
+  if (!user || completed.size !== 24) return;
+
+  const { data, error } = await supabase.rpc(
+    'claim_herops_course_xp'
+  );
+
+  if (error) {
+    console.error('HerOps XP reward:', error.message);
+    return;
+  }
+
+  let message = '';
+
+  if (data === 'AWARDED') {
+    message = 'COURSE COMPLETED! +20 XP AWARDED';
+  } else if (data === 'ALREADY_AWARDED') {
+    message = 'COURSE COMPLETED // 20 XP ALREADY AWARDED';
+  }
+
+  if (!message) return;
+
+  let reward = document.getElementById('ho-reward');
+
+  if (!reward) {
+    reward = document.createElement('div');
+    reward.id = 'ho-reward';
+    reward.className = 'ho-note';
+    reward.style.marginTop = '20px';
+    reward.style.borderLeft = '3px solid #ff4db8';
+    reward.setAttribute('role', 'status');
+    course.prepend(reward);
+  }
+
+  reward.textContent = message;
+}
+
 
 function render() {
   renderNavigation();
