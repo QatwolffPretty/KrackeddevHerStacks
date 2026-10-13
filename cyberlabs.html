@@ -35,15 +35,29 @@
       <p class="lab-muted">Select one or both tracks. You can change your selection later.</p>
       <form id="lab-interest-form">
         <div class="lab-track-grid">
-          <label class="lab-choice"><input type="checkbox" name="interest" value="herops"><span class="lab-choice-content"><span class="lab-kicker">TRACK 01 / SECURITY</span><strong>CYBERSECURITY / HEROPS</strong><span>Digital safety, OSINT, social engineering, networking and ethical security labs.</span></span></label>
-          <label class="lab-choice"><input type="checkbox" name="interest" value="vibecoding"><span class="lab-choice-content"><span class="lab-kicker">TRACK 02 / BUILD</span><strong>VIBE CODING & AI DEVELOPMENT</strong><span>Prompting, websites, AI-assisted coding, GitHub and product building.</span></span></label>
+          <label class="lab-choice">
+            <input type="checkbox" name="interest" value="herops">
+            <span class="lab-choice-content">
+              <span class="lab-kicker">TRACK 01 / SECURITY</span>
+              <strong>CYBERSECURITY / HEROPS</strong>
+              <span>Digital safety, OSINT, social engineering, networking and ethical security labs.</span>
+            </span>
+          </label>
+          <label class="lab-choice">
+            <input type="checkbox" name="interest" value="vibecoding"><span class="lab-choice-content"><span class="lab-kicker">TRACK 02 / BUILD</span><strong>VIBE CODING & AI DEVELOPMENT</strong><span>Prompting, websites, AI-assisted coding, GitHub and product building.</span></span></label>
         </div>
         <div class="lab-form-actions"><button type="submit" class="lab-button" id="lab-save" disabled>SAVE MY LEARNING PATH →</button><span id="lab-save-status" class="lab-muted" role="status"></span></div>
       </form>
     </section>
 
     <section id="lab-dashboard" class="lab-section" hidden aria-labelledby="lab-dashboard-title">
-      <div class="lab-section-heading"><div><div class="num">YOUR LEARNING SPACE</div><h2 id="lab-dashboard-title">MY LEARNING PATHS</h2></div><button type="button" class="lab-button lab-button-outline" id="lab-edit">EDIT INTERESTS</button></div>
+      <div class="lab-section-heading">
+        <div>
+          <div class="num">YOUR LEARNING SPACE</div>
+          <h2 id="lab-dashboard-title">MY LEARNING PATHS</h2>
+        </div>
+        <button type="button" class="lab-button lab-button-outline" id="lab-edit">EDIT INTERESTS</button>
+      </div>
       <div class="lab-stats"><div><span>ENROLLED TRACKS</span><strong id="lab-track-count">0</strong></div><div><span>AVAILABLE MODULES</span><strong id="lab-module-count">0</strong></div><div><span>LEARNING PROGRESS</span><strong>COMING SOON</strong></div></div>
       <div id="lab-paths" class="lab-paths"></div>
     </section>
