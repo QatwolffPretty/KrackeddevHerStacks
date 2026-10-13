@@ -182,8 +182,17 @@ async function initialize() {
     if (result.error) throw result.error;
     completed = new Set((result.data || []).map(row => row.lesson_id));
     auth.textContent = `SIGNED IN // ${user.email || 'HERSTACKS MEMBER'}`;
+    
     course.hidden = false;
-    refreshProgress(); render();
+    refreshProgress();
+    render();
+
+    // Automatically claim the one-time 20 XP reward
+    // for members who have already completed all lessons.
+    if (completed.size === 24) {
+      await checkHerOpsCourseReward();
+    }
+
   } catch (error) {
     auth.textContent = `Unable to load HerOps: ${error.message}. Ensure herops-progress.sql was run in Supabase.`;
     auth.classList.add('ho-error');
