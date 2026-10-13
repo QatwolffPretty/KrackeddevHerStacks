@@ -134,9 +134,22 @@ async function checkHerOpsCourseReward() {
   );
 
   if (error) {
-    console.error('HerOps XP reward:', error.message);
-    return;
-  }
+  console.error('HerOps XP reward:', error.message);
+    let reward = document.getElementById('ho-reward');
+    if (!reward) {
+      reward = document.createElement('div');
+      reward.id = 'ho-reward';
+      reward.className = 'ho-note';
+      course.prepend(reward);
+    }
+
+  reward.setAttribute('role', 'alert');
+  reward.textContent =
+    'XP REWARD ERROR // ' + error.message;
+
+  return;
+}
+
 
   let message = '';
 
