@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080808">
+
+  <title>Admin Control | KD HerStacks</title>
+
+  <link rel="icon" href="./favicon.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body class="hs-admin">
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="./index.html">
+        <img src="./herstacks-logo.png" alt="KD HerStacks">
+      </a>
+
+      <nav class="hs-admin-nav">
+        <a href="./index.html">HOME</a>
+        <a href="./activities.html">ACTIVITIES</a>
+        <a href="./account.html">ACCOUNT</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap hs-admin-main">
+    <section class="hs-admin-hero">
+      <div class="kicker">
+        HERSTACKS / ADMIN ACCESS / CONTROL PANEL
+      </div>
+
+      <h1>ADMIN <span>CONTROL.</span></h1>
+
+      <p>
+        Review community submissions, approve completed
+        missions, and manage XP rewards.
+      </p>
+    </section>
+
+    <div
+      id="admin-message"
+      class="hs-admin-message"
+      role="status"
+      aria-live="polite"
+    >
+      Checking administrator access...
+    </div>
+
+    <section id="admin-dashboard" hidden>
+      <div class="hs-admin-stats">
+        <article class="hs-admin-stat">
+          <small>PENDING</small>
+          <strong id="pending-count">0</strong>
+        </article>
+
+        <article class="hs-admin-stat">
+          <small>APPROVED</small>
+          <strong id="approved-count">0</strong>
+        </article>
+
+        <article class="hs-admin-stat">
+          <small>REJECTED</small>
+          <strong id="rejected-count">0</strong>
+        </article>
+      </div>
+
+      <div class="hs-admin-heading">
+        <div>
+          <div class="kicker">MISSION MANAGEMENT</div>
+          <h2>SUBMISSIONS.</h2>
+        </div>
+
+        <button
+          type="button"
+          id="refresh-submissions"
+          class="btn secondary"
+        >
+          REFRESH ↻
+        </button>
+      </div>
+
+      <div class="hs-admin-filters">
+        <button type="button" data-status="pending" class="active">
+          PENDING
+        </button>
+
+        <button type="button" data-status="approved">
+          APPROVED
+        </button>
+
+        <button type="button" data-status="rejected">
+          REJECTED
+        </button>
+
+        <button type="button" data-status="all">
+          ALL
+        </button>
+      </div>
+
+      <div
+        id="admin-submissions"
+        class="hs-admin-list"
+        aria-live="polite"
+      ></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <span>KRACKEDDEV // HERSTACKS</span>
+      <span>ADMINISTRATION / RESTRICTED ACCESS</span>
+    </div>
+  </footer>
+
+  <script type="module" src="./admin.js"></script>
+</body>
+</html>
