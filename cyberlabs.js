@@ -96,19 +96,31 @@ function renderDashboard() {
       label.textContent = name;
       const state = document.createElement('span');
       state.className = 'lab-module-status';
-      state.textContent = key === 'herops' ? 'AVAILABLE' : 'PLANNED';
+      state.textContent = 'AVAILABLE';
       row.append(number, label, state);
       modules.append(row);
     });
     article.append(heading, modules);
-    if (key === 'herops') {
-      const launch = document.createElement('a');
-      launch.href = './herops.html';
-      launch.className = 'lab-button';
-      launch.style.cssText = 'display:inline-block;margin-top:20px;text-decoration:none';
-      launch.textContent = 'START HEROPS COURSE →';
-      article.append(launch);
-    }
+    const launch = document.createElement('a');
+
+launch.href =
+  key === 'herops'
+    ? './herops.html'
+    : './vibecoding.html';
+
+launch.className = 'lab-button';
+
+launch.style.cssText =
+  'display:inline-block;' +
+  'margin-top:20px;' +
+  'text-decoration:none';
+
+launch.textContent =
+  key === 'herops'
+    ? 'CONTINUE HEROPS COURSE →'
+    : 'START VIBE CODING COURSE →';
+
+article.append(launch);
     target.append(article);
   }
 }
