@@ -16,6 +16,11 @@ const VALID_HEROPS_LESSONS = new Set(
     )
   ).flat()
 );
+// ======================================================
+// VIBE CODING / LESSON CONFIGURATION
+// ======================================================
+
+const TOTAL_VIBECODING_LESSONS = 24;
 
 let currentUserId = null;
 let refreshVersion = 0;
