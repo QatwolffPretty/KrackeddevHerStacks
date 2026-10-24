@@ -101,11 +101,80 @@
         $('xp').textContent=a.reduce((s,x)=>s+(Number(x.xp_reward)||0),0);
         const list=$('activity-list');
         list.replaceChildren();let items=a.filter(x=>state.filter==='all'||(state.filter==='open'&&active(x)&&!done.has(x.id))||(state.filter==='submitted'&&done.has(x.id)));if(!items.length){list.append(el('div','panel',a.length?'No activities match this filter.':'No published activities yet. Check back soon.'));return}for(const x of items){const c=done.get(x.id),card=el('article','activity'),head=el('div','activity-head');head.append(el('span','eyebrow',x.category||'COMMUNITY'),el('span','xp',`+${x.xp_reward||0} XP`));card.append(head,el('h3','',x.title),el('p','',x.description||'Details will be shared by the HerStacks team.'));const foot=el('div','activity-footer');foot.append(el('span','meta',x.ends_at?`ENDS ${date(x.ends_at)}`:'NO DEADLINE'));if(c){foot.append(el('span','status-pill',c.status||'pending'))}else if(!active(x)){foot.append(el('span','status-pill','Closed'))}else{const b=el('button','btn secondary',state.user?'SUBMIT WORK':'LOGIN TO SUBMIT');b.type='button';b.onclick=()=>{if(!state.user){location.href='./account.html';return}state.selected=x;$('selected-name').textContent=x.title;$('submission').value='';$('submission-feedback').textContent='';$('submit-panel').classList.remove('hidden');$('submit-panel').scrollIntoView({behavior:'smooth',block:'start'})};foot.append(b)}card.append(foot);list.append(card)}}
-      async function load(){
-        try{
-          const { data, error: authErr } = await supabase.auth.getSession();
-          if (authErr) throw authErr;
-          const user = data.session?.user ?? null;
-          state.user = user;
-          const {data,error}=await supabase.from('activities').select('id,title,description,category,xp_reward,ends_at,is_published').eq('is_published',true).order('created_at',{ascending:false});if(error)throw error;state.activities=data||[];if(user){const result=await supabase.from('activity_completions').select('activity_id,status').eq('user_id',user.id);if(result.error)notice('Activities loaded, but your submissions cannot be accessed yet. Database permissions may need configuration.');else state.completions=result.data||[]}render()}catch(e){state.activities=[];render();notice('Could not load activities: '+e.message+'. Check the Supabase connection and RLS policies.')};
+      async function load() {
+  // Show the empty state immediately instead of an endless loader.
+  render();
+
+  const timeout = (promise, label, ms = 12000) =>
+    Promise.race([
+      promise,
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error(label + ' timed out')),
+          ms
+        )
+      )
+    ]);
+
+  try {
+    // Load the activity list first.
+    // Public activities do not require a login session.
+    const result = await timeout(
+      supabase
+        .from('activities')
+        .select(
+          'id,title,description,category,xp_reward,ends_at,is_published'
+        )
+        .eq('is_published', true)
+        .order('created_at', { ascending: false }),
+      'Activities request'
+    );
+
+    if (result.error) throw result.error;
+
+    state.activities = result.data || [];
+    render();
+
+    // Load the member session separately.
+    const auth = await timeout(
+      supabase.auth.getSession(),
+      'Member session'
+    );
+
+    if (auth.error) throw auth.error;
+
+    state.user = auth.data.session?.user || null;
+
+    if (state.user) {
+      const submissions = await timeout(
+        supabase
+          .from('activity_completions')
+          .select('activity_id,status')
+          .eq('user_id', state.user.id),
+        'Submissions request'
+      );
+
+      if (submissions.error) {
+        notice(
+          'Activities loaded, but submissions could not be retrieved: ' +
+          submissions.error.message
+        );
+      } else {
+        state.completions = submissions.data || [];
+      }
+    }
+
+    render();
+
+  } catch (error) {
+    console.error('HerStacks Activity Board:', error);
+
+    notice(
+      'Activity Board connection issue: ' +
+      error.message
+    );
+
+    render();
+  }
+}
       document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{state.filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()}));$('cancel').onclick=()=>$('submit-panel').classList.add('hidden');$('submission-form').onsubmit=async e=>{e.preventDefault();if(!state.user||!state.selected)return;const button=$('send'),feedback=$('submission-feedback');button.disabled=true;feedback.textContent='Submitting…';feedback.className='feedback';try{const {error}=await supabase.from('activity_completions').insert({activity_id:state.selected.id,user_id:state.user.id,submission:$('submission').value.trim(),status:'pending'});if(error)throw error;feedback.textContent='Submitted for review. XP is not awarded until approved.';feedback.classList.add('ok');state.completions.push({activity_id:state.selected.id,status:'pending'});render();setTimeout(()=>{$('submit-panel').classList.add('hidden')},1800)}catch(err){feedback.textContent='Submission failed: '+err.message;feedback.classList.add('error')}finally{button.disabled=false}};load();</script></body></html>
