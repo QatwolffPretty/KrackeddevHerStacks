@@ -69,6 +69,24 @@ function createElement(tag, className, text) {
 }
 
 function resetDashboard() {
+  // Reset Vibe Coding progress
+setText("md-vibecoding-count", "— / 24");
+
+setText(
+  "md-vibecoding-status",
+  "Checking your progress..."
+);
+
+const vibeProgress = $("md-vibecoding-progress");
+const vibeFill = $("md-vibecoding-fill");
+
+if (vibeProgress) {
+  vibeProgress.setAttribute("aria-valuenow", "0");
+}
+
+if (vibeFill) {
+  vibeFill.style.width = "0%";
+}
   setText("md-herops-count", "— / 24");
   setText("md-herops-status", "Checking your progress...");
 
