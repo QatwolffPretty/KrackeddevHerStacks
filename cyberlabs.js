@@ -16,16 +16,22 @@ const TRACKS = {
     ]
   },
   vibecoding: {
-    title: 'VIBE CODING & AI DEVELOPMENT',
-    description: 'Learn to build and deploy digital products using AI assistance and core web development skills.',
-    modules: [
-      'Introduction to Vibe Coding',
-      'Prompt Engineering for Builders',
-      'Build Your First Website',
-      'GitHub & Deployment',
-      'Build Interactive Applications',
-      'Final Project — Ship Your Product'
-    ]
+  title: 'VIBE CODING & AI DEVELOPMENT',
+
+  description:
+    'Learn AI-assisted coding, build interactive websites, ' +
+    'work with GitHub and deploy your own digital projects.',
+
+  modules: [
+    'Introduction to Vibe Coding',
+    'Prompt Engineering for Builders',
+    'HTML & Website Structure',
+    'CSS & Responsive Design',
+    'JavaScript & Interactivity',
+    'AI-Assisted Development',
+    'GitHub & Deployment',
+    'Final Project — Ship Your Website'
+   ]
   }
 };
 
