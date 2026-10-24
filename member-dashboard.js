@@ -160,6 +160,103 @@ async function loadHerOpsProgress(userId) {
   setAchievement("md-herops-graduate", count === 24);
 }
 
+// ======================================================
+// VIBE CODING / LOAD MEMBER PROGRESS
+// ======================================================
+
+async function loadVibeCodingProgress(userId) {
+
+  const { data, error } = await supabase
+    .from("vibecoding_lesson_progress")
+    .select("lesson_id")
+    .eq("user_id", userId);
+
+  if (error) {
+
+    console.error(
+      "Vibe Coding progress:",
+      error.message
+    );
+
+    setText(
+      "md-vibecoding-status",
+      "Unable to retrieve Vibe Coding progress."
+    );
+
+    return;
+  }
+
+  // Count unique completed lessons.
+  const completedLessons = new Set(
+    (data || [])
+      .map((row) => row.lesson_id)
+      .filter(
+        (id) =>
+          typeof id === "string" &&
+          id.trim().length > 0
+      )
+  );
+
+  const completed = Math.min(
+    completedLessons.size,
+    TOTAL_VIBECODING_LESSONS
+  );
+
+  const percentage = Math.round(
+    (completed / TOTAL_VIBECODING_LESSONS) * 100
+  );
+
+  // Update lesson counter
+  setText(
+    "md-vibecoding-count",
+    `${completed} / ${TOTAL_VIBECODING_LESSONS}`
+  );
+
+  // Update progress bar
+  const progress = $("md-vibecoding-progress");
+  const fill = $("md-vibecoding-fill");
+
+  if (progress) {
+
+    progress.setAttribute(
+      "aria-valuenow",
+      String(percentage)
+    );
+
+  }
+
+  if (fill) {
+
+    fill.style.width = `${percentage}%`;
+
+  }
+
+  // Update course status
+  if (completed === TOTAL_VIBECODING_LESSONS) {
+
+    setText(
+      "md-vibecoding-status",
+      "COURSE COMPLETED / 100%"
+    );
+
+  } else if (completed === 0) {
+
+    setText(
+      "md-vibecoding-status",
+      "NOT STARTED / 0%"
+    );
+
+  } else {
+
+    setText(
+      "md-vibecoding-status",
+      `${percentage}% COMPLETE`
+    );
+
+  }
+
+}
+
 async function loadMissionStats(userId) {
   const { data, error } = await supabase
     .from("activity_completions")
@@ -196,9 +293,12 @@ async function loadMissionStats(userId) {
 function getXpDescription(transaction) {
   const reason = transaction.reason || "";
 
-  if (reason === "HEROPS_COURSE_COMPLETION") {
-    return "HerOps Course Completion";
-  }
+  if (
+  reason === "HEROPS_COURSE_COMPLETE" ||
+  reason === "HEROPS_COURSE_COMPLETION"
+) {
+  return "HerOps Course Completion";
+}
 
   if (reason === "ACTIVITY_APPROVED") {
     return "Approved Community Mission";
@@ -294,6 +394,7 @@ async function refreshDashboard() {
 
     const results = await Promise.allSettled([
       loadHerOpsProgress(user.id),
+      loadVibeCodingProgress(user.id),
       loadMissionStats(user.id),
       loadXpHistory(user.id)
     ]);
