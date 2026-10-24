@@ -1,0 +1,38 @@
+/* KD HerStacks / Vibe Coding — no rounded corners */
+.vc-page{padding:64px 0 100px;min-height:80vh}
+.vc-page>h1{font-size:clamp(3.4rem,9vw,7rem);margin:20px 0}
+.vc-page>h1 span{color:var(--pink)}
+.vc-intro{max-width:740px;color:var(--muted);font-size:clamp(.95rem,2vw,1.15rem);margin-bottom:30px}
+.vc-nav{display:flex;gap:18px;font:700 11px var(--font-body);color:var(--pink)}
+.vc-notice{background:#1a0e16;border-left:3px solid var(--pink);padding:18px;margin-bottom:26px;overflow-wrap:anywhere}
+.vc-notice a{color:var(--pink);text-decoration:underline}
+.vc-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:26px 0 16px}
+.vc-stats>div{padding:22px;background:#130d12;border:1px solid #513048}
+.vc-stats small{display:block;color:var(--muted);font-size:10px;font-weight:700}
+.vc-stats strong{display:block;color:var(--pink);font-size:clamp(1.25rem,3vw,2rem);margin-top:12px}
+.vc-progress{height:9px;background:#2b1c27;margin-bottom:24px}
+.vc-progress>div{height:100%;width:0;background:var(--pink);transition:width .3s ease}
+.vc-layout{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(0,1.5fr);gap:15px;align-items:start}
+.vc-sidebar,.vc-detail{background:#100d10;border:1px solid #442b3c;padding:22px;min-width:0}
+.vc-sidebar h2{font-size:1.15rem;margin-bottom:20px}
+.vc-module,.vc-lesson{display:grid;gap:8px;width:100%;padding:17px;margin-bottom:8px;text-align:left;background:#130d12;color:#f6edf3;border:1px solid #483040;border-radius:0;cursor:pointer}
+.vc-module.active,.vc-module:hover,.vc-lesson:hover{border-color:var(--pink);background:#2b1020}
+.vc-module small,.vc-lesson small{font:700 10px var(--font-body);color:#f18bc3}
+.vc-module strong,.vc-lesson strong{font-size:.95rem;line-height:1.4}
+.vc-detail h2{font-size:clamp(1.7rem,4vw,3rem);margin:16px 0 22px}
+.vc-detail h3{font-size:1.15rem;margin:26px 0 14px}
+.vc-copy{color:#c5b8c1;line-height:1.8}
+.vc-practice{padding:20px;background:#1e1018;border-left:3px solid var(--pink);color:#efc9dc}
+.vc-lessons{display:grid;gap:8px;margin-top:20px}
+.vc-choices{border:0;padding:0;margin:18px 0}
+.vc-option{display:flex;align-items:center;gap:12px;padding:15px;margin-bottom:8px;border:1px solid #49303f;cursor:pointer}
+.vc-option:has(input:checked){border-color:var(--pink);background:#2b1020}
+.vc-option input{accent-color:var(--pink)}
+.vc-button{display:inline-flex;justify-content:center;align-items:center;padding:13px 18px;margin:12px 12px 12px 0;min-height:46px;background:var(--pink);color:#080808;border:1px solid var(--pink);border-radius:0;font:800 11px var(--font-body);cursor:pointer;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.vc-button.vc-outline{background:transparent;color:var(--pink)}
+.vc-button:disabled{opacity:.5;cursor:not-allowed}
+.vc-feedback{color:var(--pink);margin-top:10px;overflow-wrap:anywhere}
+.vc-disclaimer{font-size:.8rem;color:var(--muted);margin-top:26px}
+.vc-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+@media(max-width:760px){.vc-page{padding-top:42px}.vc-layout{grid-template-columns:1fr}.vc-sidebar,.vc-detail{padding:18px}.vc-nav{gap:9px;font-size:10px}}
+@media(max-width:420px){.vc-stats>div{padding:12px}.vc-stats small{font-size:8px}.vc-stats strong{font-size:1rem}}
