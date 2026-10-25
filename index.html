@@ -1,41 +1,822 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" id="top">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="theme-color" content="#080808">
-    <meta name="description" content="HerStacks by KrackedDev — a women-focused technology community, activities, member accounts and HerOps cybersecurity.">
-    <title>KrackedDev — HerStacks</title>
-    <link rel="icon" href="favicon.png">
-    <link rel="stylesheet" href="styles.css">
-    <style>
-      .nav-links{gap:clamp(8px,1.2vw,20px)}
-      .nav-links>a{white-space:nowrap}
-      .community-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-      .community-panel{background:var(--panel);border:1px solid var(--line);padding:clamp(24px,4vw,42px)}
-      .community-panel .num{margin-bottom:22px}
-      .community-panel h3{margin-bottom:18px}
-      .community-panel p{color:var(--muted);margin-bottom:26px}
-      .community-panel .btn{margin-top:auto}
-      .community-panel{display:flex;flex-direction:column}
-      .nav-links>a.nav-cta{color:var(--pink);opacity:1}
-      .event-note{font:700 11px/1.6 monospace;color:var(--muted);letter-spacing:.07em}@media(max-width:700px){.community-grid{grid-template-columns:1fr}}
-    </style>
-</head>
-<body>
-<div class="preloader" id="preloader"><div class="loader"><img class="loader-logo" src="herstacks-logo.png" alt="HerStacks"><div class="loader-meta"><span>INITIALIZING HERSTACKS</span><span id="pct">0%</span></div><div class="loader-percent" aria-hidden="true"><span id="loaderBarText">0%</span></div><div class="loader-track"><div class="loader-bar" id="loaderBar"></div></div><div class="loader-status">SYSTEM READY // <span id="loaderState">BOOT SEQUENCE</span></div></div></div>
-<header class="site-header"><nav class="nav wrap"><a class="brand" href="index.html" aria-label="HerStacks home"><img src="herstacks-logo.png" alt="HerStacks"></a><div class="nav-links"><a href="#about">About</a><a href="#community">Community</a><a href="activities.html">Activities</a><a class="nav-cta" href="account.html">My Account</a><a href="#terminal">Terminal</a><a href="#guilds">Guilds</a><a href="cyberlabs.html">CyberLabs</a><a href="#partners">Partners</a><a href="#faq">FAQ</a><span class="lang"><a class="active" href="index.html">EN</a><a href="ms.html">BM</a><a href="zh.html">中文</a><a href="ja.html">日本語</a></span></div><button class="menu" type="button" aria-label="Menu" aria-expanded="false">☰</button></nav></header>
-<main>
-<section class="hero"><div class="wrap hero-grid"><div class="reveal"><div class="kicker">KRACKEDDEV / HERSTACKS</div><h1>BUILD YOUR<span>STACK.</span></h1><p class="hero-copy">A women-focused tech community to learn, build, connect and grow through practical activities and shared experiences.</p><div class="hero-actions"><a class="btn" href="activities.html">EXPLORE ACTIVITIES</a><a class="btn secondary" href="account.html">JOIN / SIGN IN</a></div></div><div class="hero-art reveal"><div class="terminal"><div class="terminal-top"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div><span class="pink">$</span> boot herstacks</div><div><span class="pink">$</span> community.status = active</div><div><span class="pink">$</span> member.portal = account.html</div><div><span class="pink">$</span> activities.portal = activities.html</div><div><span class="pink">$</span> track.cybersec = herops</div></div><img class="hero-logo" src="herstacks-logo.png" alt="HerStacks logo"></div></div></section>
-<section class="section" id="about"><div class="wrap"><div class="section-head reveal"><div><div class="num">01 / ABOUT</div><h2>A PLACE TO<br>BUILD.</h2></div><p class="section-intro">HerStacks connects women exploring technology through learning, hands-on challenges and community collaboration.</p></div><div class="cards"><article class="card reveal"><div class="card-index">01</div><h3>LEARN</h3><p>Explore web development, cybersecurity, AI and other technology pathways.</p></article><article class="card reveal"><div class="card-index">02</div><h3>BUILD</h3><p>Put your knowledge into practice through projects, activities and challenges.</p></article><article class="card reveal"><div class="card-index">03</div><h3>CONNECT</h3><p>Meet other women in tech, share ideas and support each other's progress.</p></article></div></div></section>
-<section class="section" id="community"><div class="wrap"><div class="section-head reveal"><div><div class="num">02 / MEMBER PORTAL</div><h2>YOUR NEXT<br>MOVE.</h2></div><p class="section-intro">Discover community activities or manage your member account. Both portals are part of the HerStacks experience.</p></div><div class="community-grid"><article class="community-panel reveal"><div class="num">01 / ACTIVITIES</div><h3>TAKE ON A CHALLENGE.</h3><p>Browse published activities, check available XP rewards, and submit your work when submissions are enabled.</p><a class="btn" href="activities.html">OPEN ACTIVITIES →</a></article><article class="community-panel reveal"><div class="num">02 / ACCOUNT</div><h3>OWN YOUR PROGRESS.</h3><p>Create an account, sign in, update your profile, and review your participation history when your account is connected.</p><a class="btn secondary" href="account.html">OPEN MY ACCOUNT →</a></article></div></div></section>
-<section class="section terminal-section" id="terminal"><div class="wrap"><div class="section-head reveal"><div><div class="num">03 / TERMINAL</div><h2>RUN THE<br>STACK.</h2></div><p class="section-intro">Try <b>help</b> to explore the community, activities and member portal.</p></div><div class="cyber-terminal reveal" aria-label="HerStacks interactive terminal"><div class="cyber-terminal-bar"><div class="terminal-window-title"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span>herstacks://terminal</span></div><span class="terminal-online">ONLINE</span></div><div class="terminal-output" id="terminalOutput" role="log" aria-live="polite"></div><div class="terminal-command-row"><span class="prompt-symbol">guest@herstacks:~$</span><input id="terminalInput" class="terminal-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal command" placeholder="type a command..."><button id="terminalRun" class="terminal-run" type="button">RUN</button></div><div class="terminal-quick" aria-label="Quick terminal commands"><button type="button" data-command="help">help</button><button type="button" data-command="about">about</button><button type="button" data-command="activities">activities</button><button type="button" data-command="account">account</button><button type="button" data-command="guild">guild</button><button type="button" data-command="herops">herops</button><button type="button" data-command="clear">clear</button></div><div class="terminal-hint">TIP // try <span>status</span> or <span>activities</span></div></div></div></section>
-<section class="section cyberlab-feature" id="cyberlabs"><div class="wrap"><div class="section-head reveal"><div><div class="num">04 / CYBERLABS</div><h2>LEARN THE<br>ATTACK SURFACE.</h2></div><p class="section-intro">Hands-on, beginner-friendly cybersecurity labs for HerStacks members. Explore safe simulations of vulnerabilities and their defenses.</p></div><div class="lab-feature-grid"><article class="community-panel reveal"><div class="num">SQLi-01 / WEB SECURITY</div><h3>SQL INJECTION.</h3><p>Understand insecure database queries and learn how parameterized statements prevent injection.</p><a class="btn secondary" href="cyberlabs.html#sqli">EXPLORE SQLi LAB →</a></article><article class="community-panel reveal"><div class="num">XSS-01 / WEB SECURITY</div><h3>CROSS-SITE SCRIPTING.</h3><p>Investigate unsafe HTML rendering and practice defending against script injection.</p><a class="btn secondary" href="cyberlabs.html#xss">EXPLORE XSS LAB →</a></article></div></div></section>
-<section class="section live" id="live"><div class="wrap"><div class="section-head reveal"><div><div class="num">05 / COMMUNITY</div><h2>STAY<br>CONNECTED.</h2></div><p class="section-intro">HerStacks WhatsApp Community is ready. Join to hear about upcoming sessions, discussions and opportunities.</p></div><div class="live-grid"><div class="event-box reveal"><div class="event-label">WHATSAPP COMMUNITY</div><div class="event-date">CONNECT WITH HERSTACKS</div><p class="event-note">Community announcements, peer discussions and event updates.</p><div class="status"><a class="btn" target="_blank" rel="noopener noreferrer" href="https://chat.whatsapp.com/JEWFq1UET5p8IBKuswFubK">JOIN WHATSAPP COMMUNITY ↗</a></div></div><div class="notice reveal"><h3>KEEP BUILDING.</h3><p>Explore available activities, connect with members, and follow the official guilds for new opportunities.</p><a class="btn secondary" href="activities.html">VIEW ACTIVITIES →</a></div></div></div></section>
-<section class="section guilds" id="guilds"><div class="wrap"><div class="section-head reveal"><div><div class="num">06 / GUILDS</div><h2>JOIN THE<br>NETWORK.</h2></div><p class="section-intro">Explore the official KrackedDev HerStacks and HerOps guilds.</p></div><div class="guild-grid"><article class="guild-card herstack reveal"><div class="guild-label">KRACKEDDEV / HERSTACKS</div><div class="guild-meta">TECH COMMUNITY</div><h3>BUILD WITH HERSTACKS.</h3><p>A community for women learning and building in technology, including web development, AI and digital innovation.</p><a class="btn" target="_blank" rel="noopener noreferrer" href="https://krackeddevs.com/guilds/krackeddev-herstacks">OPEN HERSTACKS GUILD ↗</a></article><article class="guild-card herops reveal"><div class="guild-label">KRACKEDDEV / HEROPS</div><div class="guild-meta">CYBERSECURITY</div><h3>ENTER HEROPS.</h3><p>Discover cybersecurity learning, ethical hacking concepts, labs and beginner-friendly challenges.</p><a class="btn burg" target="_blank" rel="noopener noreferrer" href="https://krackeddevs.com/guilds/krackeddev-herops">OPEN HEROPS GUILD ↗</a></article></div></div></section>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0b0d">
 
-<section class="section partners" id="partners" aria-labelledby="partners-heading"><div class="wrap"><div class="section-head reveal"><div><div class="num">07 / PARTNERS</div><h2 id="partners-heading">OUR<br>PARTNERS.</h2></div><p class="section-intro">Connecting communities, technology, and innovation.</p></div></div><div class="partner-marquee" aria-label="Our partners"><div class="partner-track"><div class="partner-item" ><img loading="lazy" src="partner-nexaris.png" alt="Nexaris.my"><span>Nexaris.my</span></div><div class="partner-item" ><img loading="lazy" src="partner-cyberasia.png" alt="CyberAsia.io"><span>CyberAsia.io</span></div><div class="partner-item" ><img loading="lazy" src="partner-hacktivist.png" alt="Hacktivist Haven"><span>Hacktivist Haven</span></div><div class="partner-item" ><img loading="lazy" src="partner-krackeddev.png" alt="Krackeddev"><span>Krackeddev</span></div><div class="partner-item" aria-hidden="true"><img loading="lazy" src="partner-nexaris.png" alt=""><span>Nexaris.my</span></div><div class="partner-item" aria-hidden="true"><img loading="lazy" src="partner-cyberasia.png" alt=""><span>CyberAsia.io</span></div><div class="partner-item" aria-hidden="true"><img loading="lazy" src="partner-hacktivist.png" alt=""><span>Hacktivist Haven</span></div><div class="partner-item" aria-hidden="true"><img loading="lazy" src="partner-krackeddev.png" alt=""><span>Krackeddev</span></div></div></div></section>
-<section class="section" id="faq"><div class="wrap"><div class="section-head reveal"><div><div class="num">08 / FAQ</div><h2>QUICK<br>ANSWERS.</h2></div><p class="section-intro">Everything you need to get started with the HerStacks community.</p></div><div class="faq"><details class="reveal"><summary>How do I join HerStacks?</summary><p>Join the WhatsApp Community or visit the official HerStacks guild page. You can also create a member account through the Account page.</p></details><details class="reveal"><summary>Where can I find activities?</summary><p>Open the Activities page to browse published challenges and community tasks.</p></details><details class="reveal"><summary>How does XP work?</summary><p>Activities may award XP after a submission has been reviewed and approved. XP cannot be self-awarded by members.</p></details><details class="reveal"><summary>What is HerOps?</summary><p>HerOps is the cybersecurity learning pathway connected to the HerStacks community.</p></details></div></div></section>
-</main><footer id="footer"><div class="wrap foot"><span>KRACKEDDEV / HERSTACKS</span><span>TECH COMMUNITY / 2026</span></div></footer>
-<script src="script.js"></script><script type="module" src="./backend.js"></script>
-</body></html>
+  <meta
+    name="description"
+    content="KD HerStacks is a women-focused technology community empowering members to learn, build and grow through practical experiences."
+  >
+
+  <title>KD HerStacks — Women Building What's Next</title>
+
+  <link rel="icon" href="./favicon.png">
+  <link rel="stylesheet" href="./homepage.css">
+
+  <script src="./homepage.js" defer></script>
+  <script type="module" src="./backend.js"></script>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header" id="site-header">
+    <div class="container header-inner">
+
+      <a class="brand" href="./index.html" aria-label="KD HerStacks home">
+        <img src="./herstacks-logo.png" alt="KD HerStacks">
+      </a>
+
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a href="#about">About</a>
+        <a href="#pathways">Learning</a>
+        <a href="#experience">Community</a>
+        <a href="#partners">Partners</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="header-login" href="./account.html">Member Login</a>
+
+        <a class="button button-primary header-join" href="#join">
+          Join HerStacks <span aria-hidden="true">↗</span>
+        </a>
+
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          type="button"
+          aria-label="Open navigation"
+          aria-controls="mobile-nav"
+          aria-expanded="false"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+    </div>
+
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden>
+      <a href="#about">About</a>
+      <a href="#pathways">Learning Pathways</a>
+      <a href="#experience">Community</a>
+      <a href="#partners">Partners</a>
+      <a href="./activities.html">Activities</a>
+      <a href="./cyberlabs.html">CyberLabs</a>
+      <a href="./account.html">Member Account</a>
+      <a href="#join">Join HerStacks</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-title">
+
+      <div class="hero-atmosphere" aria-hidden="true">
+        <div class="hero-grid-lines"></div>
+        <div class="hero-orbit orbit-one"></div>
+        <div class="hero-orbit orbit-two"></div>
+        <div class="hero-glow"></div>
+      </div>
+
+      <div class="container hero-content">
+
+        <div class="hero-main" data-reveal>
+
+          <div class="eyebrow">
+            <span class="eyebrow-line"></span>
+            KRACKEDDEV / HERSTACKS
+          </div>
+
+          <div class="hero-badge">
+            A COMMUNITY FOR WOMEN IN TECHNOLOGY
+          </div>
+
+          <h1 id="hero-title">
+            The future of tech
+            <span>is built together.</span>
+          </h1>
+
+          <p class="hero-description">
+            A space for women to explore technology, develop
+            practical skills and connect with a community
+            that believes in building what comes next.
+          </p>
+
+          <div class="hero-buttons">
+
+            <a class="button button-primary" href="#join">
+              Become a Member
+              <span aria-hidden="true">↗</span>
+            </a>
+
+            <a class="button button-outline" href="#pathways">
+              Explore Learning
+              <span aria-hidden="true">→</span>
+            </a>
+
+          </div>
+
+          <div class="hero-footnote">
+            <span class="status-indicator"></span>
+            LEARN / BUILD / CONNECT / GROW
+          </div>
+
+        </div>
+
+        <div class="hero-visual" data-reveal aria-hidden="true">
+
+          <div class="visual-frame">
+
+            <div class="visual-topline">
+              <span>HERSTACKS / NETWORK</span>
+              <span>EST. IN COMMUNITY</span>
+            </div>
+
+            <div class="visual-center">
+              <div class="visual-ring ring-outer"></div>
+              <div class="visual-ring ring-middle"></div>
+              <div class="visual-ring ring-inner"></div>
+
+              <div class="visual-core">
+                <img src="./herstacks-logo.png" alt="">
+              </div>
+
+              <span class="visual-node node-one"></span>
+              <span class="visual-node node-two"></span>
+              <span class="visual-node node-three"></span>
+            </div>
+
+            <div class="visual-bottomline">
+              <span>KNOWLEDGE IN MOTION</span>
+              <span class="visual-live">
+                <span class="status-indicator"></span>
+                COMMUNITY ACTIVE
+              </span>
+            </div>
+
+          </div>
+
+          <div class="visual-caption">
+            A NETWORK BUILT AROUND POSSIBILITY.
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="hero-bottom">
+        <div class="container hero-bottom-inner">
+          <span>INDEPENDENT THINKING. COLLECTIVE GROWTH.</span>
+          <a href="#about">
+            SCROLL TO EXPLORE <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- INTRO STRIP -->
+    <section class="intro-strip" aria-label="Our focus">
+      <div class="container intro-strip-inner">
+        <span>OUR FOCUS</span>
+        <strong>EDUCATION</strong>
+        <span class="strip-divider"></span>
+        <strong>COLLABORATION</strong>
+        <span class="strip-divider"></span>
+        <strong>OPPORTUNITY</strong>
+        <span class="strip-divider"></span>
+        <strong>INNOVATION</strong>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section about-section" id="about">
+
+      <div class="container">
+
+        <div class="section-heading" data-reveal>
+          <div class="section-label">
+            <span>01 / WHO WE ARE</span>
+          </div>
+
+          <div>
+            <h2>
+              More than a community.
+              <span>A place to move forward.</span>
+            </h2>
+
+            <p class="section-lead">
+              HerStacks brings women together through technology,
+              practical learning and meaningful connections.
+              Whether you're starting out or developing existing
+              skills, there's room to grow.
+            </p>
+          </div>
+        </div>
+
+        <div class="values-grid">
+
+          <article class="value-card" data-reveal>
+            <div class="value-top">
+              <span>01</span>
+              <span class="value-icon" aria-hidden="true">↗</span>
+            </div>
+
+            <h3>Learn with purpose.</h3>
+
+            <p>
+              Discover technology through structured pathways,
+              shared resources and accessible learning experiences.
+            </p>
+          </article>
+
+          <article class="value-card" data-reveal>
+            <div class="value-top">
+              <span>02</span>
+              <span class="value-icon" aria-hidden="true">⌘</span>
+            </div>
+
+            <h3>Build with confidence.</h3>
+
+            <p>
+              Turn ideas into practical projects, develop your
+              portfolio and strengthen your technical capabilities.
+            </p>
+          </article>
+
+          <article class="value-card" data-reveal>
+            <div class="value-top">
+              <span>03</span>
+              <span class="value-icon" aria-hidden="true">◎</span>
+            </div>
+
+            <h3>Grow through connection.</h3>
+
+            <p>
+              Exchange ideas, collaborate with peers and be part
+              of a network of women exploring the future of tech.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- LEARNING PATHWAYS -->
+    <section class="section pathways-section" id="pathways">
+
+      <div class="container">
+
+        <div class="section-top" data-reveal>
+          <div>
+            <span class="section-label">02 / LEARNING PATHWAYS</span>
+            <h2>
+              Choose your direction.
+              <span>Build your expertise.</span>
+            </h2>
+          </div>
+
+          <a class="text-link" href="./cyberlabs.html">
+            ALL LEARNING PATHS <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <div class="pathway-grid">
+
+          <article class="pathway-card pathway-herops" data-reveal>
+
+            <div class="pathway-card-top">
+              <span>PATHWAY / 001</span>
+              <span class="pathway-status">AVAILABLE</span>
+            </div>
+
+            <div class="pathway-card-content">
+
+              <div class="pathway-symbol" aria-hidden="true">01.</div>
+
+              <div class="pathway-category">CYBERSECURITY</div>
+
+              <h3>HerOps.</h3>
+
+              <p>
+                Build foundational cybersecurity knowledge
+                through guided lessons covering digital safety,
+                networking, web security and defensive practices.
+              </p>
+
+              <div class="pathway-meta">
+                <span>08 MODULES</span>
+                <span>24 LESSONS</span>
+              </div>
+
+            </div>
+
+            <a class="pathway-link" href="./herops.html">
+              Explore HerOps
+              <span aria-hidden="true">↗</span>
+            </a>
+
+          </article>
+
+          <article class="pathway-card pathway-vibe" data-reveal>
+
+            <div class="pathway-card-top">
+              <span>PATHWAY / 002</span>
+              <span class="pathway-status">AVAILABLE</span>
+            </div>
+
+            <div class="pathway-card-content">
+
+              <div class="pathway-symbol" aria-hidden="true">02.</div>
+
+              <div class="pathway-category">AI & DEVELOPMENT</div>
+
+              <h3>Vibe Coding.</h3>
+
+              <p>
+                Explore AI-assisted development, build websites,
+                understand the fundamentals of coding and learn
+                how to bring digital ideas online.
+              </p>
+
+              <div class="pathway-meta">
+                <span>08 MODULES</span>
+                <span>24 LESSONS</span>
+              </div>
+
+            </div>
+
+            <a class="pathway-link" href="./vibecoding.html">
+              Explore Vibe Coding
+              <span aria-hidden="true">↗</span>
+            </a>
+
+          </article>
+
+        </div>
+
+        <div class="pathways-footer" data-reveal>
+          <p>
+            New to technology? Start with a pathway that
+            interests you and progress at your own pace.
+          </p>
+
+          <a class="text-link" href="./cyberlabs.html">
+            VIEW LEARNING HUB →
+          </a>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section class="section experience-section" id="experience">
+
+      <div class="container">
+
+        <div class="section-top" data-reveal>
+          <div>
+            <span class="section-label">03 / THE EXPERIENCE</span>
+
+            <h2>
+              Learn individually.
+              <span>Progress collectively.</span>
+            </h2>
+          </div>
+        </div>
+
+        <div class="experience-layout">
+
+          <div class="experience-intro" data-reveal>
+            <p>
+              HerStacks combines self-paced learning with
+              community participation, giving members
+              opportunities to apply what they learn.
+            </p>
+
+            <a class="button button-outline" href="./activities.html">
+              Explore Activities
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+
+          <div class="experience-steps">
+
+            <div class="experience-step" data-reveal>
+              <span class="step-number">01</span>
+
+              <div>
+                <h3>Explore</h3>
+                <p>
+                  Discover pathways, topics and opportunities
+                  aligned with your interests.
+                </p>
+              </div>
+
+              <span class="step-arrow" aria-hidden="true">↗</span>
+            </div>
+
+            <div class="experience-step" data-reveal>
+              <span class="step-number">02</span>
+
+              <div>
+                <h3>Learn</h3>
+                <p>
+                  Develop practical skills through lessons,
+                  resources and guided activities.
+                </p>
+              </div>
+
+              <span class="step-arrow" aria-hidden="true">↗</span>
+            </div>
+
+            <div class="experience-step" data-reveal>
+              <span class="step-number">03</span>
+
+              <div>
+                <h3>Participate</h3>
+                <p>
+                  Join community challenges, share your work
+                  and connect with fellow members.
+                </p>
+              </div>
+
+              <span class="step-arrow" aria-hidden="true">↗</span>
+            </div>
+
+            <div class="experience-step" data-reveal>
+              <span class="step-number">04</span>
+
+              <div>
+                <h3>Grow</h3>
+                <p>
+                  Track your progress, build confidence and
+                  continue developing your technical journey.
+                </p>
+              </div>
+
+              <span class="step-arrow" aria-hidden="true">↗</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- MEMBER PORTAL -->
+    <section class="section portal-section" id="portal">
+
+      <div class="container">
+
+        <div class="portal-panel" data-reveal>
+
+          <div class="portal-copy">
+
+            <span class="section-label">
+              04 / MEMBER EXPERIENCE
+            </span>
+
+            <h2>
+              Your progress.
+              <span>One place.</span>
+            </h2>
+
+            <p>
+              Access your learning pathways, follow lesson
+              completion, participate in activities and
+              view your community achievements.
+            </p>
+
+            <div class="portal-actions">
+
+              <a class="button button-primary" href="./account.html">
+                Open Member Dashboard
+                <span aria-hidden="true">↗</span>
+              </a>
+
+              <a class="text-link" href="./activities.html">
+                BROWSE ACTIVITIES →
+              </a>
+
+            </div>
+
+          </div>
+
+          <div class="portal-preview" aria-hidden="true">
+
+            <div class="preview-top">
+              <span>MEMBER / OVERVIEW</span>
+              <span class="preview-dot"></span>
+            </div>
+
+            <div class="preview-title">YOUR LEARNING</div>
+
+            <div class="preview-course">
+              <div class="preview-course-label">
+                <span>HEROPS</span>
+                <span>CYBERSECURITY</span>
+              </div>
+
+              <div class="preview-track">
+                <div class="preview-fill fill-herops"></div>
+              </div>
+            </div>
+
+            <div class="preview-course">
+              <div class="preview-course-label">
+                <span>VIBE CODING</span>
+                <span>AI & DEVELOPMENT</span>
+              </div>
+
+              <div class="preview-track">
+                <div class="preview-fill fill-vibe"></div>
+              </div>
+            </div>
+
+            <div class="preview-bottom">
+              PERSONAL LEARNING DASHBOARD
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- COMMUNITY -->
+    <section class="section community-section" id="community">
+
+      <div class="container">
+
+        <div class="section-top" data-reveal>
+          <div>
+            <span class="section-label">05 / COMMUNITY NETWORK</span>
+
+            <h2>
+              Better connected.
+              <span>Stronger together.</span>
+            </h2>
+          </div>
+        </div>
+
+        <div class="community-layout">
+
+          <div class="community-feature" data-reveal>
+
+            <span class="community-kicker">
+              HERSTACKS / COMMUNITY
+            </span>
+
+            <h3>
+              Find your people.
+              Share your journey.
+            </h3>
+
+            <p>
+              Connect with women exploring technology,
+              exchange knowledge and stay informed about
+              community sessions and opportunities.
+            </p>
+
+            <a
+              class="button button-primary"
+              href="https://chat.whatsapp.com/JEWFq1UET5p8IBKuswFubK"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Join WhatsApp Community
+              <span aria-hidden="true">↗</span>
+            </a>
+
+          </div>
+
+          <div class="community-links" data-reveal>
+
+            <a
+              class="community-link"
+              href="https://krackeddevs.com/guilds/krackeddev-herstacks"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div>
+                <span>OFFICIAL GUILD</span>
+                <h4>KD HerStacks</h4>
+                <p>Women in technology</p>
+              </div>
+
+              <span class="community-link-arrow" aria-hidden="true">↗</span>
+            </a>
+
+            <a
+              class="community-link"
+              href="https://krackeddevs.com/guilds/krackeddev-herops"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div>
+                <span>CYBERSECURITY GUILD</span>
+                <h4>KD HerOps</h4>
+                <p>Security education & exploration</p>
+              </div>
+
+              <span class="community-link-arrow" aria-hidden="true">↗</span>
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- PARTNERS -->
+    <section class="section partners-section" id="partners">
+
+      <div class="container">
+
+        <div class="section-top" data-reveal>
+          <div>
+            <span class="section-label">06 / OUR NETWORK</span>
+
+            <h2>
+              Connected through
+              <span>shared ambition.</span>
+            </h2>
+          </div>
+        </div>
+
+        <p class="partners-intro" data-reveal>
+          Organisations and communities connected to the
+          HerStacks ecosystem.
+        </p>
+
+      </div>
+
+      <div class="partner-marquee" aria-label="Our network">
+
+        <div class="partner-track">
+
+          <div class="partner-item">
+            <img src="./partner-nexaris.png" alt="Nexaris">
+          </div>
+
+          <div class="partner-item">
+            <img src="./partner-cyberasia.png" alt="CyberAsia">
+          </div>
+
+          <div class="partner-item">
+            <img src="./partner-hacktivist.png" alt="Hacktivist Haven">
+          </div>
+
+          <div class="partner-item">
+            <img src="./partner-krackeddev.png" alt="Krackeddev">
+          </div>
+
+          <!-- Duplicate items for seamless animation -->
+          <div class="partner-item" aria-hidden="true">
+            <img src="./partner-nexaris.png" alt="">
+          </div>
+
+          <div class="partner-item" aria-hidden="true">
+            <img src="./partner-cyberasia.png" alt="">
+          </div>
+
+          <div class="partner-item" aria-hidden="true">
+            <img src="./partner-hacktivist.png" alt="">
+          </div>
+
+          <div class="partner-item" aria-hidden="true">
+            <img src="./partner-krackeddev.png" alt="">
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- JOIN CTA -->
+    <section class="join-section" id="join">
+
+      <div class="container">
+
+        <div class="join-content" data-reveal>
+
+          <span class="section-label">
+            07 / START YOUR JOURNEY
+          </span>
+
+          <h2>
+            Your next chapter
+            <span>starts here.</span>
+          </h2>
+
+          <p>
+            Wherever you are in your technology journey,
+            there's a place for you to learn, contribute
+            and grow with HerStacks.
+          </p>
+
+          <div class="join-actions">
+
+            <a
+              class="button button-primary"
+              href="https://chat.whatsapp.com/JEWFq1UET5p8IBKuswFubK"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Join the Community
+              <span aria-hidden="true">↗</span>
+            </a>
+
+            <a class="button button-outline" href="./account.html">
+              Create Member Account
+              <span aria-hidden="true">→</span>
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+
+    <div class="container">
+
+      <div class="footer-main">
+
+        <div class="footer-brand">
+
+          <img src="./herstacks-logo.png" alt="KD HerStacks">
+
+          <p>
+            Building a more connected future
+            for women in technology.
+          </p>
+
+        </div>
+
+        <div class="footer-column">
+          <h4>EXPLORE</h4>
+
+          <a href="#about">About</a>
+          <a href="#pathways">Learning</a>
+          <a href="./activities.html">Activities</a>
+          <a href="./cyberlabs.html">CyberLabs</a>
+        </div>
+
+        <div class="footer-column">
+          <h4>MEMBERS</h4>
+
+          <a href="./account.html">Member Account</a>
+          <a href="./herops.html">HerOps</a>
+          <a href="./vibecoding.html">Vibe Coding</a>
+        </div>
+
+        <div class="footer-column">
+          <h4>LANGUAGE</h4>
+
+          <a href="./index.html">English</a>
+          <a href="./ms.html">Bahasa Melayu</a>
+          <a href="./zh.html">中文</a>
+          <a href="./ja.html">日本語</a>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+
+        <span>© <span id="current-year">2026</span> KRACKEDDEV / HERSTACKS</span>
+
+        <span>LEARN. BUILD. CONNECT. GROW.</span>
+
+        <a href="#top">BACK TO TOP ↑</a>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+</body>
+</html>
