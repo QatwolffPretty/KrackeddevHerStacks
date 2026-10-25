@@ -1764,3 +1764,154 @@ h2 span {
   }
 
 }
+
+/* ==========================================
+   HERSTACKS / MEMBER STATISTICS
+   ========================================== */
+
+.member-stats-section {
+  padding: 110px 0;
+  background: #101013;
+  border-bottom: 1px solid var(--border);
+}
+
+.member-stats-layout {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  align-items: center;
+  gap: 90px;
+}
+
+.member-stats-copy h2 {
+  max-width: 620px;
+}
+
+.member-stats-copy p {
+  max-width: 490px;
+  margin-top: 25px;
+  margin-bottom: 35px;
+
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.85;
+}
+
+.member-counter-card {
+  position: relative;
+  min-height: 350px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  padding: 32px;
+
+  background: #17151a;
+  border: 1px solid #513247;
+
+  overflow: hidden;
+}
+
+.member-counter-card::after {
+  content: "";
+  position: absolute;
+
+  width: 240px;
+  height: 240px;
+
+  right: -100px;
+  bottom: -100px;
+
+  border: 1px solid rgba(255, 77, 184, 0.15);
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.member-counter-top,
+.member-counter-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+
+  color: #9d929c;
+}
+
+.counter-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--pink);
+}
+
+.member-counter-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+
+  padding: 35px 0;
+}
+
+.member-counter-number {
+  display: block;
+
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 9vw, 9rem);
+  font-weight: 700;
+  line-height: 1;
+
+  color: var(--pink);
+  letter-spacing: -0.06em;
+
+  font-variant-numeric: tabular-nums;
+}
+
+.member-counter-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+
+  color: var(--white);
+}
+
+.member-counter-bottom {
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .member-stats-layout {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+}
+
+@media (max-width: 650px) {
+  .member-stats-section {
+    padding: 85px 0;
+  }
+
+  .member-counter-card {
+    min-height: 290px;
+    padding: 22px;
+  }
+
+  .member-counter-number {
+    font-size: clamp(4.8rem, 22vw, 7rem);
+  }
+
+  .member-counter-top,
+  .member-counter-bottom {
+    font-size: 9px;
+  }
+
+  .member-counter-bottom {
+    flex-wrap: wrap;
+  }
+}
