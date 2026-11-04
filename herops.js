@@ -119,19 +119,30 @@ function renderLesson() {
   const submit = button('CHECK ANSWER →', async () => {
     if (busy || questionChoice < 0) return;
     feedback.replaceChildren();
-    if (questionChoice !== answer) {
-      feedback.textContent = 'Not quite. Review the lesson and try again.';
-      return;
-    }
     if (completed.has(lessonId(m, l))) {
       feedback.textContent = `Correct. ${explanation} This lesson is already completed.`;
       return;
     }
     busy = true; submit.disabled = true;
-    feedback.textContent = 'Correct. Saving completion to your account…';
+    feedback.textContent = 'Checking answer securely…';
     try {
-      const { error } = await supabase.from('herops_lesson_progress').upsert({ user_id: user.id, lesson_id: lessonId(m, l) }, { onConflict: 'user_id,lesson_id' });
-      if (error) throw error;
+      
+const { data, error } = await supabase.rpc(
+  'complete_herops_lesson',
+  {
+    p_lesson_id: lessonId(m, l),
+    p_answer: questionChoice
+  }
+);
+
+if (error) throw error;
+
+if (!data?.correct || !data?.completed) {
+  feedback.textContent =
+    data?.message || 'Incorrect answer. Please try again.';
+  return;
+}
+
       
       completed.add(lessonId(m, l));
       refreshProgress();
@@ -146,7 +157,7 @@ function renderLesson() {
       const next = l < 2 ? [m, l + 1] : m < 7 ? [m + 1, 0] : null;
       if (next) target.append(button('NEXT LESSON →', () => { activeModule = next[0]; activeLesson = next[1]; questionChoice = -1; render(); }));
     } catch (error) {
-      feedback.textContent = `Correct answer, but completion was not saved: ${error.message}. Check the Supabase SQL setup.`;
+      feedback.textContent = `Unable to verify lesson: ${error.message}`;
     } finally { busy = false; submit.disabled = false; }
   });
   submit.disabled = true;
