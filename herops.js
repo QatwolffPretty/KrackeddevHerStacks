@@ -65,6 +65,7 @@ function refreshProgress() {
   $('ho-percent').textContent = `${percent}%`;
   $('ho-progress').setAttribute('aria-valuenow', String(percent));
   $('ho-progress-fill').style.width = `${percent}%`;
+  refreshAssessmentAccess();
 }
 
 function renderNavigation() {
