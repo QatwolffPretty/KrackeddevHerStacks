@@ -402,6 +402,68 @@ if (certificateLink) {
     certificateLink.textContent = "MY CERTIFICATES →";
 }
 
+// ======================================================
+// HEROPS / CERTIFICATE STATUS
+// ======================================================
+
+async function loadCertificateStatus() {
+  const card = $("md-herops-certificate");
+  const link = $("md-cert-link");
+
+  if (!card) return;
+
+  try {
+    const { data, error } = await supabase.rpc(
+      "get_my_herops_certificate"
+    );
+
+    if (error) throw error;
+
+    if (!data) {
+      setAchievement("md-herops-certificate", false);
+      setText("md-cert-description", "No certificate issued yet.");
+      setText("md-cert-meta", "");
+      setText("md-cert-status", "NOT ISSUED");
+
+      if (link) link.textContent = "VIEW / CLAIM →";
+      return;
+    }
+
+    if (data.revoked) {
+      setAchievement("md-herops-certificate", false);
+      setText("md-cert-description", "Certificate revoked.");
+      setText("md-cert-meta", data.certificate_number);
+      setText("md-cert-status", "REVOKED");
+      return;
+    }
+
+    setAchievement("md-herops-certificate", true);
+
+    setText(
+      "md-cert-description",
+      `Issued to ${data.recipient_name}`
+    );
+
+    setText(
+      "md-cert-meta",
+      `${data.certificate_number} · ${formatDate(data.issued_at)}`
+    );
+
+    setText("md-cert-status", "EARNED ✓");
+
+    if (link) {
+      link.textContent = "VIEW / DOWNLOAD →";
+    }
+
+  } catch (error) {
+    console.error("Certificate status:", error.message);
+
+    setAchievement("md-herops-certificate", false);
+    setText("md-cert-description", "Certificate status unavailable.");
+    setText("md-cert-status", "UNAVAILABLE");
+  }
+}
+
 async function refreshDashboard() {
   const version = ++refreshVersion;
 
