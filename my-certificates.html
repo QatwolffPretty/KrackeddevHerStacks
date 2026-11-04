@@ -1,12 +1,905 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><title>My Certificates | KD HerStacks</title>
-<style>
-:root{color-scheme:dark;--pink:#f04da5;--bg:#090909;--panel:#151315;--line:#45323e;--text:#f6f2f5;--muted:#b5a9b2}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,sans-serif}header{border-bottom:1px solid var(--line);padding:18px 24px}header a{color:var(--pink);text-decoration:none;font:700 14px monospace}main{max-width:1020px;margin:auto;padding:36px 18px 80px}h1{font-size:clamp(30px,5vw,48px);line-height:1.15}.eyebrow{color:var(--pink);font:12px monospace;letter-spacing:.15em}.panel{border:1px solid var(--line);background:var(--panel);padding:clamp(18px,4vw,32px);margin:24px 0}.muted{color:var(--muted)}.error{color:#ff9aa7}button,a.button{display:inline-block;background:var(--pink);color:#140710;border:1px solid var(--pink);border-radius:0;padding:13px 19px;font:700 12px monospace;text-decoration:none;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.outline{background:transparent!important;color:var(--text)!important;border-color:var(--line)!important}.cert{position:relative;background:#131216;color:#fff;border:2px solid #bb4d86;padding:34px;min-height:450px;display:flex;flex-direction:column;justify-content:space-between}.cert-top,.cert-bottom{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}.cert-label{font:700 13px monospace;letter-spacing:.14em;color:#f47ab9}.cert-center{text-align:center;margin:32px 0}.cert-center h2{font-size:clamp(25px,4vw,45px);margin:14px 0;overflow-wrap:anywhere}.cert-center h3{font-size:clamp(18px,3vw,27px);margin:8px 0}.cert-center p{color:#d2c6cf}.cert-small{font:12px monospace;color:#d2c6cf}.cert-number{overflow-wrap:anywhere}.qr{background:#fff;padding:8px;width:118px;min-height:118px;display:flex;align-items:center;justify-content:center}.qr img,.qr canvas{width:102px!important;height:102px!important}.status-revoked{color:#ff9aa7;font-weight:bold}.no-print{display:block}@page{size:A4 landscape;margin:0}@media print{html,body{width:297mm;height:210mm;background:#131216!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}header,main>h1,main>.eyebrow,main>.muted,.actions,.no-print{display:none!important}main{padding:0;max-width:none}.panel{border:0;margin:0;padding:0;background:transparent}.cert{width:297mm;height:210mm;min-height:0;padding:17mm 20mm;border:7mm solid #171217;outline:1.5mm solid #b94983;outline-offset:-11mm;page-break-inside:avoid}.cert-center{margin:12mm 0}.cert-center h2{font-size:36pt}.cert-center h3{font-size:23pt}.qr{width:28mm;min-height:28mm}.qr img,.qr canvas{width:25mm!important;height:25mm!important}}
-</style></head><body><header><a href="./account.html">← MY ACCOUNT</a></header><main><div class="eyebrow">KD HERSTACKS / MY CERTIFICATES</div><h1>My Certificates</h1><p class="muted">Certificates are issued only after verified course completion and a passing final assessment.</p><div class="panel no-print" id="status" role="status">Checking your certificate...</div><section class="panel" id="certificate-panel" hidden><div class="cert" id="certificate"><div class="cert-top"><div class="cert-label">KD HERSTACKS / HEROPS</div><div class="cert-small">CERTIFICATE OF COMPLETION</div></div><div class="cert-center"><div class="cert-label">THIS CERTIFIES THAT</div><h2 id="recipient"></h2><p>has successfully completed the learning programme</p><h3 id="course"></h3><div class="cert-label">HEROPS LEARNING PATH</div></div><div class="cert-bottom"><div><div class="cert-small">DATE ISSUED</div><strong id="date"></strong><div class="cert-small" style="margin-top:12px">CERTIFICATE ID</div><div class="cert-small cert-number" id="number"></div></div><div><div class="cert-small">VERIFY AUTHENTICITY</div><div class="qr" id="qr"></div></div></div></div><div class="actions no-print"><button id="print" type="button">SAVE AS PDF / PRINT</button><a class="button outline" id="verify" target="_blank" rel="noopener">VERIFY CERTIFICATE</a></div><p class="muted no-print">To download: tap SAVE AS PDF / PRINT, then choose Save as PDF in your browser's print/share options. Use landscape A4 and enable background graphics if prompted. The official logos and signature will be added when approved assets are supplied.</p></section></main>
-<script type="module">
-import {supabase} from './supabase-client.js';
-const $=id=>document.getElementById(id);const status=$('status');
-function showStatus(message,error=false){status.hidden=false;status.textContent=message;status.className='panel no-print'+(error?' error':'');}
-async function load(){try{const {data:auth,error:authError}=await supabase.auth.getUser();if(authError||!auth.user){showStatus('Sign in through My Account to view your certificates.');return;}const {data,error}=await supabase.rpc('get_my_herops_certificate');if(error)throw error;if(!data){showStatus('No certificate issued yet. Complete 24 lessons and pass the final assessment (80% or higher) once certificates are available.');return;}if(data.revoked){showStatus('This certificate has been revoked and cannot be downloaded as a valid certificate.',true);return;}const number=data.certificate_number;const verifyUrl=new URL('./verify-certificate.html',location.href);verifyUrl.searchParams.set('id',number);$('recipient').textContent=data.recipient_name;$('course').textContent=data.course_title;$('date').textContent=new Date(data.issued_at).toLocaleDateString('en-MY',{day:'2-digit',month:'long',year:'numeric'});$('number').textContent=number;$('verify').href=verifyUrl.href;const img=document.createElement('img');img.alt='Scan to verify certificate';img.src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=0&data='+encodeURIComponent(verifyUrl.href);img.onerror=()=>{$('qr').textContent='QR unavailable — use verification link';};$('qr').append(img);$('certificate-panel').hidden=false;status.hidden=true;}catch(error){showStatus('Could not load certificate: '+error.message,true);}}
-$('print').addEventListener('click',()=>{const img=$('qr').querySelector('img');if(img&&!img.complete){showStatus('QR code is still loading. Please wait and try again.');return;}window.print();});load();
-</script></body></html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta name="theme-color" content="#090909">
+
+    <title>My Certificates | KD HerStacks</title>
+
+    <link rel="icon" href="./favicon.png">
+
+    <style>
+        /* =========================================
+           01 / DESIGN TOKENS
+        ========================================= */
+
+        :root {
+            color-scheme: dark;
+
+            --bg: #090909;
+            --panel: #151315;
+            --certificate: #131216;
+
+            --pink: #f04da5;
+            --pink-light: #f47ab9;
+
+            --text: #f6f2f5;
+            --muted: #b5a9b2;
+            --line: #45323e;
+
+            --error: #ff9aa7;
+            --success: #8ee4b4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 16px/1.6 system-ui, sans-serif;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        /* =========================================
+           02 / HEADER
+        ========================================= */
+
+        .site-header {
+            border-bottom: 1px solid var(--line);
+            padding: 18px 24px;
+        }
+
+        .header-inner {
+            max-width: 1020px;
+            margin: 0 auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .site-logo {
+            width: 110px;
+            max-height: 52px;
+            object-fit: contain;
+        }
+
+        .back-link {
+            color: var(--pink);
+            text-decoration: none;
+            font: 700 12px monospace;
+        }
+
+        /* =========================================
+           03 / MAIN LAYOUT
+        ========================================= */
+
+        main {
+            max-width: 1020px;
+            margin: 0 auto;
+            padding: 40px 20px 90px;
+        }
+
+        .eyebrow {
+            color: var(--pink);
+            font: 12px/1.5 monospace;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 18px 0;
+            font-size: clamp(30px, 5vw, 48px);
+            line-height: 1.2;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        p {
+            color: var(--muted);
+        }
+
+        .panel {
+            margin-top: 24px;
+            padding: clamp(20px, 4vw, 32px);
+
+            background: var(--panel);
+            border: 1px solid var(--line);
+        }
+
+        .status {
+            padding: 18px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+
+            margin-top: 24px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .status.error {
+            color: var(--error);
+        }
+
+        .status.success {
+            color: var(--success);
+        }
+
+        /* =========================================
+           04 / BUTTONS
+        ========================================= */
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        button,
+        .button {
+            display: inline-block;
+
+            padding: 14px 20px;
+
+            border: 1px solid var(--pink);
+            border-radius: 0;
+
+            background: var(--pink);
+            color: #140710;
+
+            font: 700 12px/1.5 monospace;
+            text-decoration: none;
+            text-align: center;
+            text-transform: uppercase;
+
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-outline {
+            background: transparent;
+            border-color: var(--line);
+            color: var(--text);
+        }
+
+        /* =========================================
+           05 / CERTIFICATE DESIGN
+        ========================================= */
+
+        .certificate {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            min-height: 460px;
+            padding: 34px;
+
+            background: var(--certificate);
+            border: 2px solid #bb4d86;
+            color: #ffffff;
+        }
+
+        .certificate-header,
+        .certificate-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .certificate-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .certificate-logo {
+            width: 86px;
+            max-height: 54px;
+            object-fit: contain;
+        }
+
+        .certificate-label {
+            font: 700 12px/1.5 monospace;
+            letter-spacing: 0.12em;
+            color: var(--pink-light);
+        }
+
+        .certificate-small {
+            color: #d2c6cf;
+            font: 12px/1.6 monospace;
+        }
+
+        .certificate-body {
+            margin: 32px 0;
+            text-align: center;
+        }
+
+        .certificate-body h2 {
+            margin: 14px 0;
+
+            font-size: clamp(26px, 5vw, 44px);
+            line-height: 1.2;
+            overflow-wrap: anywhere;
+        }
+
+        .certificate-body h3 {
+            margin: 12px 0;
+            font-size: clamp(19px, 3vw, 28px);
+        }
+
+        .certificate-body p {
+            color: #d2c6cf;
+        }
+
+        .certificate-number {
+            overflow-wrap: anywhere;
+        }
+
+        .certificate-date {
+            display: block;
+            margin-bottom: 14px;
+        }
+
+        /* =========================================
+           06 / QR VERIFICATION
+        ========================================= */
+
+        .qr-box {
+            width: 120px;
+            min-height: 120px;
+            padding: 9px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #ffffff;
+            color: #111111;
+        }
+
+        .qr-box img {
+            width: 102px;
+            height: 102px;
+            display: block;
+        }
+
+        .qr-label {
+            margin-bottom: 7px;
+            text-align: center;
+        }
+
+        /* =========================================
+           07 / RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 600px) {
+            .site-header {
+                padding: 14px 18px;
+            }
+
+            .site-logo {
+                width: 90px;
+            }
+
+            .certificate {
+                padding: 22px;
+            }
+
+            .certificate-header {
+                align-items: flex-start;
+            }
+
+            .certificate-footer {
+                align-items: flex-start;
+            }
+
+            .certificate-body {
+                margin: 38px 0;
+            }
+        }
+
+        /* =========================================
+           08 / A4 LANDSCAPE PRINT
+        ========================================= */
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        @media print {
+            html,
+            body {
+                width: 297mm;
+                height: 210mm;
+
+                background: var(--certificate) !important;
+
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .site-header,
+            .page-heading,
+            .no-print,
+            #status,
+            #claim-panel,
+            .actions {
+                display: none !important;
+            }
+
+            main {
+                width: 297mm;
+                max-width: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            #certificate-panel {
+                margin: 0;
+                padding: 0;
+                border: 0;
+                background: transparent;
+            }
+
+            .certificate {
+                width: 297mm;
+                height: 210mm;
+                min-height: 0;
+
+                padding: 18mm 22mm;
+
+                border: 7mm solid #171217;
+                outline: 1.5mm solid #b94983;
+                outline-offset: -11mm;
+
+                break-inside: avoid;
+            }
+
+            .certificate-body h2 {
+                font-size: 36pt;
+            }
+
+            .certificate-body h3 {
+                font-size: 23pt;
+            }
+
+            .qr-box {
+                width: 29mm;
+                min-height: 29mm;
+            }
+
+            .qr-box img {
+                width: 25mm;
+                height: 25mm;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =========================================
+         HEADER
+    ========================================= -->
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="./account.html">
+                <img
+                    src="./herstacks-logo.png"
+                    alt="KD HerStacks"
+                    class="site-logo"
+                >
+            </a>
+
+            <a href="./account.html" class="back-link">
+                ← MY ACCOUNT
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <!-- =====================================
+             PAGE HEADING
+        ====================================== -->
+
+        <div class="page-heading">
+            <div class="eyebrow">
+                KD HERSTACKS / MY CERTIFICATES
+            </div>
+
+            <h1>My Certificates</h1>
+
+            <p>
+                Certificates are issued after verified course
+                completion and a passing final assessment.
+            </p>
+        </div>
+
+        <!-- =====================================
+             STATUS MESSAGE
+        ====================================== -->
+
+        <div
+            id="status"
+            class="status"
+            role="status"
+            aria-live="polite"
+        >
+            Checking your certificate...
+        </div>
+
+        <!-- =====================================
+             CLAIM CERTIFICATE
+        ====================================== -->
+
+        <section
+            id="claim-panel"
+            class="panel no-print"
+            hidden
+        >
+            <div class="eyebrow">
+                HEROPS / CERTIFICATE ELIGIBILITY
+            </div>
+
+            <h2>Certificate Not Issued Yet.</h2>
+
+            <p>
+                Complete 24 HerOps lessons and pass the
+                Final Assessment with at least 80%.
+            </p>
+
+            <p>
+                If you have already passed, claim your
+                Certificate of Completion below.
+            </p>
+
+            <p>
+                Your profile display name will be printed
+                on the certificate and the certificate
+                record will be publicly verifiable.
+            </p>
+
+            <div class="actions">
+                <button
+                    type="button"
+                    id="claim-button"
+                >
+                    ISSUE MY CERTIFICATE
+                </button>
+
+                <a
+                    href="./account.html"
+                    class="button button-outline"
+                >
+                    CHECK PROFILE NAME
+                </a>
+            </div>
+        </section>
+
+        <!-- =====================================
+             ISSUED CERTIFICATE
+        ====================================== -->
+
+        <section
+            id="certificate-panel"
+            class="panel"
+            hidden
+        >
+            <article
+                id="certificate"
+                class="certificate"
+            >
+                <div class="certificate-header">
+                    <div class="certificate-brand">
+                        <img
+                            class="certificate-logo"
+                            src="./herstacks-logo.png"
+                            alt="KD HerStacks"
+                        >
+
+                        <div class="certificate-label">
+                            HERSTACKS / HEROPS
+                        </div>
+                    </div>
+
+                    <div class="certificate-small">
+                        CERTIFICATE OF COMPLETION
+                    </div>
+                </div>
+
+                <div class="certificate-body">
+                    <div class="certificate-label">
+                        THIS CERTIFIES THAT
+                    </div>
+
+                    <h2 id="recipient"></h2>
+
+                    <p>
+                        has successfully completed
+                        the learning programme
+                    </p>
+
+                    <h3 id="course"></h3>
+
+                    <div class="certificate-label">
+                        HEROPS LEARNING PATH
+                    </div>
+                </div>
+
+                <div class="certificate-footer">
+                    <div>
+                        <div class="certificate-small">
+                            DATE ISSUED
+                        </div>
+
+                        <strong
+                            id="date"
+                            class="certificate-date"
+                        ></strong>
+
+                        <div class="certificate-small">
+                            CERTIFICATE ID
+                        </div>
+
+                        <div
+                            id="number"
+                            class="certificate-small certificate-number"
+                        ></div>
+                    </div>
+
+                    <div>
+                        <div class="certificate-small qr-label">
+                            VERIFY AUTHENTICITY
+                        </div>
+
+                        <div
+                            id="qr"
+                            class="qr-box"
+                        ></div>
+                    </div>
+                </div>
+            </article>
+
+            <div class="actions no-print">
+                <button
+                    type="button"
+                    id="print-button"
+                >
+                    SAVE AS PDF / PRINT
+                </button>
+
+                <a
+                    id="verify-link"
+                    class="button button-outline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    VERIFY CERTIFICATE
+                </a>
+            </div>
+
+            <p class="no-print">
+                To save a PDF, use the print dialog
+                and select Save as PDF where supported.
+                Use A4 landscape with background graphics.
+            </p>
+
+            <p class="no-print">
+                Official partner logos and the authorized
+                signature will be added to the final
+                certificate template.
+            </p>
+        </section>
+    </main>
+
+    <!-- =========================================
+         JAVASCRIPT / SUPABASE INTEGRATION
+    ========================================= -->
+
+    <script type="module">
+        import { supabase } from './supabase-client.js';
+
+        const $ = (id) => document.getElementById(id);
+
+        const status = $('status');
+        const claimPanel = $('claim-panel');
+        const certificatePanel = $('certificate-panel');
+        const claimButton = $('claim-button');
+        const printButton = $('print-button');
+
+        let qrImage = null;
+        let busy = false;
+
+        /* =====================================
+           01 / STATUS HANDLING
+        ====================================== */
+
+        function showStatus(message, type = '') {
+            status.hidden = false;
+            status.textContent = message;
+
+            status.className = type
+                ? `status ${type}`
+                : 'status';
+        }
+
+        function hideStatus() {
+            status.hidden = true;
+        }
+
+        /* =====================================
+           02 / VERIFICATION URL
+        ====================================== */
+
+        function getVerificationUrl(certificateNumber) {
+            const url = new URL(
+                './verify-certificate.html',
+                window.location.href
+            );
+
+            url.searchParams.set(
+                'id',
+                certificateNumber
+            );
+
+            return url.href;
+        }
+
+        /* =====================================
+           03 / RENDER QR CODE
+        ====================================== */
+
+        function renderQrCode(verificationUrl) {
+            const container = $('qr');
+
+            container.replaceChildren();
+            qrImage = null;
+
+            const image = document.createElement('img');
+
+            image.alt = 'Certificate verification QR code';
+
+            image.src =
+                'https://api.qrserver.com/v1/create-qr-code/' +
+                '?size=220x220&margin=0&data=' +
+                encodeURIComponent(verificationUrl);
+
+            image.onerror = () => {
+                qrImage = null;
+
+                container.textContent =
+                    'QR unavailable';
+            };
+
+            qrImage = image;
+            container.append(image);
+        }
+
+        /* =====================================
+           04 / DISPLAY CERTIFICATE
+        ====================================== */
+
+        function displayCertificate(data) {
+            claimPanel.hidden = true;
+            certificatePanel.hidden = false;
+
+            $('recipient').textContent =
+                data.recipient_name;
+
+            $('course').textContent =
+                data.course_title ||
+                'Cybersecurity Fundamentals';
+
+            $('date').textContent =
+                new Date(data.issued_at)
+                    .toLocaleDateString('en-MY', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+
+            $('number').textContent =
+                data.certificate_number;
+
+            const verificationUrl = getVerificationUrl(
+                data.certificate_number
+            );
+
+            $('verify-link').href = verificationUrl;
+
+            renderQrCode(verificationUrl);
+
+            hideStatus();
+        }
+
+        /* =====================================
+           05 / LOAD MEMBER CERTIFICATE
+        ====================================== */
+
+        async function loadCertificate() {
+            claimPanel.hidden = true;
+            certificatePanel.hidden = true;
+
+            showStatus('Checking certificate registry...');
+
+            try {
+                const { data: auth, error: authError } =
+                    await supabase.auth.getUser();
+
+                if (authError || !auth?.user) {
+                    showStatus(
+                        'Please sign in through My Account first.',
+                        'error'
+                    );
+
+                    return;
+                }
+
+                const { data, error } = await supabase.rpc(
+                    'get_my_herops_certificate'
+                );
+
+                if (error) {
+                    throw error;
+                }
+
+                if (!data) {
+                    claimPanel.hidden = false;
+
+                    showStatus(
+                        'No certificate issued yet. ' +
+                        'If you have passed the final assessment, ' +
+                        'you may claim your certificate below.'
+                    );
+
+                    return;
+                }
+
+                if (data.revoked) {
+                    showStatus(
+                        'This certificate has been revoked. ' +
+                        'It cannot be displayed as valid or downloaded.',
+                        'error'
+                    );
+
+                    return;
+                }
+
+                displayCertificate(data);
+            } catch (error) {
+                showStatus(
+                    'Unable to load certificate: ' +
+                    error.message,
+                    'error'
+                );
+            }
+        }
+
+        /* =====================================
+           06 / CLAIM CERTIFICATE
+        ====================================== */
+
+        async function claimCertificate() {
+            if (busy) {
+                return;
+            }
+
+            busy = true;
+            claimButton.disabled = true;
+
+            showStatus(
+                'Verifying course completion and assessment result...'
+            );
+
+            try {
+                const { data, error } = await supabase.rpc(
+                    'issue_herops_certificate'
+                );
+
+                if (error) {
+                    throw error;
+                }
+
+                if (!data?.certificate_number) {
+                    throw new Error(
+                        'Certificate response is incomplete.'
+                    );
+                }
+
+                if (data.revoked) {
+                    throw new Error(
+                        'This certificate has been revoked.'
+                    );
+                }
+
+                showStatus(
+                    'Certificate issued successfully. ' +
+                    'Loading certificate...',
+                    'success'
+                );
+
+                await loadCertificate();
+            } catch (error) {
+                showStatus(
+                    'Unable to issue certificate: ' +
+                    error.message,
+                    'error'
+                );
+            } finally {
+                busy = false;
+                claimButton.disabled = false;
+            }
+        }
+
+        /* =====================================
+           07 / PDF PRINT
+        ====================================== */
+
+        function printCertificate() {
+            if (certificatePanel.hidden) {
+                return;
+            }
+
+            if (
+                !qrImage ||
+                !qrImage.complete ||
+                qrImage.naturalWidth === 0
+            ) {
+                showStatus(
+                    'QR code is not ready. ' +
+                    'Please check your connection and try again.',
+                    'error'
+                );
+
+                return;
+            }
+
+            window.print();
+        }
+
+        /* =====================================
+           08 / EVENT LISTENERS
+        ====================================== */
+
+        claimButton.addEventListener(
+            'click',
+            claimCertificate
+        );
+
+        printButton.addEventListener(
+            'click',
+            printCertificate
+        );
+
+        /* =====================================
+           09 / INITIALIZE
+        ====================================== */
+
+        loadCertificate();
+    </script>
+</body>
+</html>
