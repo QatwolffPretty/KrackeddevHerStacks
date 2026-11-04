@@ -425,12 +425,13 @@ async function refreshDashboard() {
       currentUserId = user.id;
     }
 
-    const results = await Promise.allSettled([
-      loadHerOpsProgress(user.id),
-      loadVibeCodingProgress(user.id),
-      loadMissionStats(user.id),
-      loadXpHistory(user.id)
-    ]);
+const results = await Promise.allSettled([
+  loadHerOpsProgress(user.id),
+  loadVibeCodingProgress(user.id),
+  loadMissionStats(user.id),
+  loadXpHistory(user.id),
+  loadCertificateStatus()
+]);
 
     if (version !== refreshVersion) return;
 
