@@ -107,6 +107,22 @@ if (vibeFill) {
 
   setAchievement("md-first-mission", false);
   setAchievement("md-herops-graduate", false);
+  // Reset certificate status.
+  setAchievement("md-herops-certificate", false);
+
+  setText(
+    "md-cert-description",
+    "Checking certificate status..."
+  );
+
+  setText("md-cert-meta", "");
+  setText("md-cert-status", "CHECKING...");
+
+  const certificateLink = $("md-cert-link");
+
+  if (certificateLink) {
+    certificateLink.textContent = "MY CERTIFICATES →";
+  }
 }
 
 async function loadHerOpsProgress(userId) {
