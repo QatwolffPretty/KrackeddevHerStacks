@@ -392,7 +392,72 @@
         $('notice').textContent=message||''}
       function setMode(m){mode=m;$('login-tab').classList.toggle('active',m==='login');$('signup-tab').classList.toggle('active',m==='signup');$('auth-title').textContent=m==='login'?'Welcome back.':'Join HerStacks.';$('auth-button').textContent=m==='login'?'SIGN IN':'CREATE ACCOUNT';$('password').autocomplete=m==='login'?'current-password':'new-password';feedback('auth-feedback','')}
       $('login-tab').onclick=()=>setMode('login');$('signup-tab').onclick=()=>setMode('signup');
-      $('auth-form').onsubmit=async e=>{e.preventDefault();const b=$('auth-button');b.disabled=true;feedback('auth-feedback','Please wait…');try{const email=$('email').value.trim(),password=$('password').value;const {data,error}=mode==='login'?await supabase.auth.signInWithPassword({email,password}):await supabase.auth.signUp({email,password});if(error)throw error;if(mode==='signup'&&!data.session){feedback('auth-feedback','Account created. Check your email for a confirmation link, then sign in.')}else{feedback('auth-feedback','Success.');await refresh()}}catch(err){feedback('auth-feedback',err.message,true)}finally{b.disabled=false}};
+      
+$('auth-form').onsubmit = async (event) => {
+    event.preventDefault();
+
+    const button = $('auth-button');
+
+    button.disabled = true;
+
+    feedback('auth-feedback', 'Please wait…');
+
+    try {
+        const email = $('email').value.trim();
+        const password = $('password').value;
+
+        // Always redirect email confirmation
+        // to the actual GitHub Pages account URL.
+        const redirectUrl = new URL(
+            './account.html',
+            window.location.href
+        ).href;
+
+        let result;
+
+        if (mode === 'login') {
+            result = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+        } else {
+            result = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: redirectUrl
+                }
+            });
+        }
+
+        const { data, error } = result;
+
+        if (error) {
+            throw error;
+        }
+
+        if (mode === 'signup' && !data.session) {
+            feedback(
+                'auth-feedback',
+                'Account created. Check your email ' +
+                'for a confirmation link, then sign in.'
+            );
+        } else {
+            feedback('auth-feedback', 'Success.');
+
+            await refresh();
+        }
+    } catch (error) {
+        feedback(
+            'auth-feedback',
+            error.message,
+            true
+        );
+    } finally {
+        button.disabled = false;
+    }
+};
+
       async function 
         refresh(){
           try{
