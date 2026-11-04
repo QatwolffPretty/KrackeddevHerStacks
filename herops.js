@@ -26,6 +26,38 @@ const button = (text, handler, cls = 'ho-button') => {
   return b;
 };
 
+
+function refreshAssessmentAccess() {
+  const status = document.getElementById(
+    'ho-assessment-status'
+  );
+
+  const link = document.getElementById(
+    'ho-assessment-link'
+  );
+
+  if (!status || !link) return;
+
+  const completedCount = completed.size;
+
+  if (completedCount >= 24) {
+    status.textContent =
+      '24/24 LESSONS COMPLETED // ' +
+      'FINAL ASSESSMENT READY';
+
+    link.hidden = false;
+  } else {
+    const remaining = Math.max(0, 24 - completedCount);
+
+    status.textContent =
+      'ASSESSMENT LOCKED // Complete ' +
+      remaining + ' more lesson(s) to unlock.';
+
+    link.hidden = true;
+  }
+}
+
+
 function refreshProgress() {
   const n = completed.size;
   const percent = Math.round(n / 24 * 100);
