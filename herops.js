@@ -101,7 +101,7 @@ function renderModule() {
 
 function renderLesson() {
   const m = activeModule, l = activeLesson;
-  const [title, theory, question, options, answer, explanation, practice] = modules[m].lessons[l];
+  const [title, theory, question, options, , explanation, practice] = modules[m].lessons[l];
   const target = $('ho-detail');
   target.replaceChildren();
   target.append(button('← ALL LESSONS', () => { activeLesson = -1; render(); }, 'ho-button ho-button-outline ho-back'));
