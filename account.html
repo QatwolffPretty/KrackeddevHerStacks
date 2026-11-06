@@ -459,17 +459,25 @@
       const $=id=>
         document.getElementById(id);
       let mode='login',user=null;
-      function feedback(id,message,error=false){
+      // ========================================
+       // PASSWORD RECOVERY STATE
+      // ========================================
+
+      let isRecovering =
+      new URLSearchParams(
+        window.location.hash.slice(1)
+      ).get('type') === 'recovery';
+       function feedback(id,message,error=false){
         const n=$(id);
         n.textContent=message;
         n.className='feedback '+(error?'error':'ok')}
-      function notice(message){
+       function notice(message){
         $('notice').hidden=!message;
         $('notice').textContent=message||''}
-      function setMode(m){mode=m;$('login-tab').classList.toggle('active',m==='login');$('signup-tab').classList.toggle('active',m==='signup');$('auth-title').textContent=m==='login'?'Welcome back.':'Join HerStacks.';$('auth-button').textContent=m==='login'?'SIGN IN':'CREATE ACCOUNT';$('password').autocomplete=m==='login'?'current-password':'new-password';feedback('auth-feedback','')}
-      $('login-tab').onclick=()=>setMode('login');$('signup-tab').onclick=()=>setMode('signup');
+       function setMode(m){mode=m;$('login-tab').classList.toggle('active',m==='login');$('signup-tab').classList.toggle('active',m==='signup');$('auth-title').textContent=m==='login'?'Welcome back.':'Join HerStacks.';$('auth-button').textContent=m==='login'?'SIGN IN':'CREATE ACCOUNT';$('password').autocomplete=m==='login'?'current-password':'new-password';feedback('auth-feedback','')}
+       $('login-tab').onclick=()=>setMode('login');$('signup-tab').onclick=()=>setMode('signup');
       
-$('auth-form').onsubmit = async (event) => {
+   $('auth-form').onsubmit = async (event) => {
     event.preventDefault();
 
     const button = $('auth-button');
