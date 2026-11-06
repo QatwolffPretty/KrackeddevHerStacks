@@ -541,9 +541,167 @@
         button.disabled = false;
     }
 };
+// ========================================
+// FORGOT PASSWORD / SEND RESET EMAIL
+// ========================================
 
+$('forgot-password').addEventListener(
+    'click',
+    async () => {
+        const emailInput = $('email');
+        const email = emailInput.value.trim();
+
+        if (!email || !emailInput.checkValidity()) {
+            feedback(
+                'auth-feedback',
+                'Enter a valid email address first.',
+                true
+            );
+
+            emailInput.focus();
+            return;
+        }
+
+        const button = $('forgot-password');
+        button.disabled = true;
+
+        feedback(
+            'auth-feedback',
+            'Sending password reset instructions...'
+        );
+
+        try {
+            const redirectTo = new URL(
+                './account.html',
+                window.location.href
+            ).href;
+
+            const { error } =
+                await supabase.auth.resetPasswordForEmail(
+                    email,
+                    { redirectTo }
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            feedback(
+                'auth-feedback',
+                'If an account exists for this email, ' +
+                'you will receive a password reset link.'
+            );
+        } catch (error) {
+            feedback(
+                'auth-feedback',
+                error.message,
+                true
+            );
+        } finally {
+            button.disabled = false;
+        }
+    }
+);
+
+// ========================================
+// UPDATE PASSWORD
+// ========================================
+
+$('password-recovery-form').addEventListener(
+    'submit',
+    async (event) => {
+        event.preventDefault();
+
+        const password = $('new-password').value;
+        const confirmation = $('confirm-password').value;
+        const button = $('save-new-password');
+        const output = $('password-recovery-feedback');
+
+        if (password !== confirmation) {
+            output.textContent =
+                'Passwords do not match.';
+            return;
+        }
+
+        if (password.length < 8) {
+            output.textContent =
+                'Use at least 8 characters.';
+            return;
+        }
+
+        button.disabled = true;
+        output.textContent = 'Updating password...';
+
+        try {
+            const { error } =
+                await supabase.auth.updateUser({
+                    password
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            // End the temporary recovery session.
+            const { error: signOutError } =
+                await supabase.auth.signOut();
+
+            if (signOutError) {
+                throw signOutError;
+            }
+
+            isRecovering = false;
+
+            window.history.replaceState(
+                null,
+                '',
+                window.location.pathname
+            );
+
+            await refresh();
+
+            setMode('login');
+
+            feedback(
+                'auth-feedback',
+                'Password updated successfully. ' +
+                'Sign in with your new password.'
+            );
+        } catch (error) {
+            output.textContent =
+                'Unable to finish password reset: ' +
+                error.message;
+        } finally {
+            button.disabled = false;
+        }
+    }
+);
+
+// ========================================
+// DETECT PASSWORD RECOVERY LINK
+// ========================================
+
+supabase.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY') {
+        isRecovering = true;
+
+        setTimeout(() => {
+            refresh();
+        }, 0);
+    }
+});
       async function 
         refresh(){
+          if (isRecovering) {
+    $('auth').classList.add('hidden');
+    $('member').classList.add('hidden');
+
+    $('password-recovery').classList.remove('hidden');
+
+    return;
+}
+
+$('password-recovery').classList.add('hidden');
           try{
             const {data,error}=await supabase.auth.getUser();if(error)throw error;user=data.user;$('auth').classList.toggle('hidden',!!user);$('member').classList.toggle('hidden',!user);if(!user)return;$('member-email').textContent=user.email||'Member';await Promise.all([loadProfile(),loadHistory(),loadXp()])}catch(e){notice('Unable to verify your session: '+e.message)}}
       async function loadProfile(){const {data,error}=await supabase.from('profiles').select('display_name,bio').eq('id',user.id).maybeSingle();if(error){notice('Your profile cannot be loaded yet. Check profile RLS policies.');return}$('display-name').value=data?.display_name||'';$('bio').value=data?.bio||''}
