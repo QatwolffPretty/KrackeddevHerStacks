@@ -139,6 +139,39 @@
         <button type="button" class="btn secondary" id="google-signin" style="width:100%;gap:14px">CONTINUE WITH GOOGLE</button>
         <p id="google-error" class="feedback" role="status"></p>
       </section>
+      <!-- ========================================
+            PASSWORD RECOVERY
+           ======================================== -->
+
+      <section id="password-recovery" class="panel hidden">
+      <div class="kicker">
+        HERSTACKS / ACCOUNT RECOVERY
+      </div>
+        <h2>Set a new password.</h2>
+        <p>Enter and confirm your new password.</p>
+        <form id="password-recovery-form">
+          <div class="field">
+            <label for="new-password">
+                New password
+            </label>
+            <input id="new-password" type="password" minlength="8" autocomplete="new-password" required>
+          </div>
+
+         <div class="field">
+            <label for="confirm-password">
+                Confirm password
+            </label>
+
+            <input id="confirm-password" type="password" minlength="8" autocomplete="new-password" required>
+         </div>
+
+         <button id="save-new-password" class="btn" type="submit">
+            SAVE NEW PASSWORD
+         </button>
+
+         <p id="password-recovery-feedback" class="feedback" role="status"l></p>
+        </form>
+      </section>
       <section id="member" class="hidden">
         <div class="dash-grid">
           <div class="stat">
