@@ -376,6 +376,341 @@
       </div>
 
     </section>
+    
+<!-- =========================================
+     HEROPS PRACTICAL / PROGRAMME BENEFITS
+========================================= -->
+
+<section
+    class="section pathways-section"
+    id="herops-practical"
+>
+    <div class="container">
+
+        <div class="section-top">
+            <div>
+                <span class="section-label">
+                    02A / HEROPS PRACTICAL
+                </span>
+
+                <h2>
+                    Learn cybersecurity.
+                    <span>Prove your skills.</span>
+                </h2>
+            </div>
+        </div>
+
+        <p class="section-lead">
+            A self-paced practical cybersecurity pathway
+            developed using Hacktivist Haven learning modules.
+            Go beyond theory through coding exercises,
+            simulated threats and defensive security labs.
+        </p>
+
+        <div class="pathway-grid">
+
+            <article class="pathway-card pathway-herops">
+                <div class="pathway-card-top">
+                    <span>PRACTICAL PATH / V2</span>
+                    <span class="pathway-status">
+                        IN DEVELOPMENT
+                    </span>
+                </div>
+
+                <div class="pathway-card-content">
+                    <div class="pathway-category">
+                        WHAT YOU UNLOCK
+                    </div>
+
+                    <h3>RM50. Once.</h3>
+
+                    <p>
+                        One-time programme access after
+                        payment verification. No recurring
+                        subscription is planned.
+                    </p>
+
+                    <div class="pathway-meta">
+                        <span>CODING LABS</span>
+                        <span>SAFE SIMULATIONS</span>
+                    </div>
+
+                    <p>
+                        Learn at your own pace, practise
+                        Python and web security, complete
+                        hands-on challenges and work
+                        towards a practical certificate.
+                    </p>
+                </div>
+
+                <a
+                    class="pathway-link"
+                    href="./herops-payment.html"
+                >
+                    View Programme Access
+                    <span aria-hidden="true">↗</span>
+                </a>
+            </article>
+
+            <article class="pathway-card pathway-vibe">
+                <div class="pathway-card-top">
+                    <span>WHY THIS PATHWAY?</span>
+                    <span class="pathway-status">
+                        HANDS-ON
+                    </span>
+                </div>
+
+                <div class="pathway-card-content">
+                    <div class="pathway-category">
+                        HACKTIVIST HAVEN × HERSTACKS
+                    </div>
+
+                    <h3>Build. Test. Defend.</h3>
+
+                    <p>
+                        Instead of only reading lessons
+                        and answering multiple-choice
+                        questions, you will work through
+                        safe, practical security exercises.
+                    </p>
+
+                    <div class="pathway-meta">
+                        <span>WRITE CODE</span>
+                        <span>INVESTIGATE</span>
+                    </div>
+
+                    <p>
+                        The RM50 programme fee supports
+                        KD HerStacks guild events,
+                        community activities and the
+                        learning experience.
+                    </p>
+                </div>
+            </article>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- =========================================
+     UPCOMING ONLINE SESSIONS
+========================================= -->
+
+<section
+    class="section experience-section"
+    id="online-sessions"
+>
+    <div class="container">
+
+        <div class="section-top">
+            <div>
+                <span class="section-label">
+                    02B / COMMUNITY SESSIONS
+                </span>
+
+                <h2>
+                    Learn together.
+                    <span>Join us online.</span>
+                </h2>
+            </div>
+        </div>
+
+        <p class="section-lead">
+            Upcoming online workshops, technical
+            discussions and community learning sessions.
+        </p>
+
+        <div
+            id="upcoming-session-list"
+            class="pathway-grid"
+            aria-live="polite"
+        >
+            <p>Checking upcoming sessions...</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- =========================================
+     SUPABASE / PUBLIC SESSIONS FEED
+========================================= -->
+
+<script type="module">
+    import { supabase } from './supabase-client.js';
+
+    const container = document.getElementById(
+        'upcoming-session-list'
+    );
+
+    function createNode(tag, className, text) {
+        const element = document.createElement(tag);
+
+        if (className) {
+            element.className = className;
+        }
+
+        if (text !== undefined) {
+            element.textContent = text;
+        }
+
+        return element;
+    }
+
+    function formatSessionDate(value) {
+        return new Intl.DateTimeFormat('en-MY', {
+            timeZone: 'Asia/Kuala_Lumpur',
+            dateStyle: 'full',
+            timeStyle: 'short'
+        }).format(new Date(value));
+    }
+
+    async function loadUpcomingSessions() {
+        const { data, error } = await supabase
+            .from('guild_online_sessions')
+            .select(
+                'title,description,starts_at,' +
+                'duration_minutes,signup_url'
+            )
+            .eq('is_published', true)
+            .gte(
+                'starts_at',
+                new Date().toISOString()
+            )
+            .order('starts_at', {
+                ascending: true
+            })
+            .limit(6);
+
+        container.replaceChildren();
+
+        if (error) {
+            container.append(
+                createNode(
+                    'p',
+                    '',
+                    'Unable to load sessions right now.'
+                )
+            );
+
+            return;
+        }
+
+        if (!data?.length) {
+            container.append(
+                createNode(
+                    'p',
+                    '',
+                    'No upcoming sessions announced yet. ' +
+                    'Check back for new schedules.'
+                )
+            );
+
+            return;
+        }
+
+        for (const session of data) {
+            const card = createNode(
+                'article',
+                'pathway-card pathway-herops'
+            );
+
+            const top = createNode(
+                'div',
+                'pathway-card-top'
+            );
+
+            top.append(
+                createNode(
+                    'span',
+                    '',
+                    'HERSTACKS / ONLINE'
+                ),
+                createNode(
+                    'span',
+                    'pathway-status',
+                    'UPCOMING'
+                )
+            );
+
+            const content = createNode(
+                'div',
+                'pathway-card-content'
+            );
+
+            content.append(
+                createNode(
+                    'div',
+                    'pathway-category',
+                    formatSessionDate(
+                        session.starts_at
+                    ) + ' MYT'
+                ),
+                createNode(
+                    'h3',
+                    '',
+                    session.title
+                ),
+                createNode(
+                    'p',
+                    '',
+                    session.description ||
+                    'Join our next community session.'
+                )
+            );
+
+            const meta = createNode(
+                'div',
+                'pathway-meta'
+            );
+
+            meta.append(
+                createNode(
+                    'span',
+                    '',
+                    `${session.duration_minutes} MIN`
+                ),
+                createNode(
+                    'span',
+                    '',
+                    'ONLINE'
+                )
+            );
+
+            content.append(meta);
+            card.append(top, content);
+
+            if (session.signup_url) {
+                try {
+                    const url = new URL(
+                        session.signup_url
+                    );
+
+                    if (url.protocol === 'https:') {
+                        const link = createNode(
+                            'a',
+                            'pathway-link',
+                            'REGISTER FOR SESSION ↗'
+                        );
+
+                        link.href = url.href;
+                        link.target = '_blank';
+                        link.rel =
+                            'noopener noreferrer';
+
+                        card.append(link);
+                    }
+                } catch {
+                    // Ignore invalid registration links.
+                }
+            }
+
+            container.append(card);
+        }
+    }
+
+    loadUpcomingSessions();
+</script>
 
     <!-- EXPERIENCE -->
     <section class="section experience-section" id="experience">
