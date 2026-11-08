@@ -147,6 +147,107 @@
             </button>
 
             <div id="payments"></div>
+<!-- =========================================
+     ONLINE SESSIONS / ADMIN MANAGEMENT
+========================================= -->
+
+<section id="guild-sessions-admin" class="card" hidden>
+    <div class="eyebrow">
+        HERSTACKS / ONLINE SESSIONS
+    </div>
+
+    <h2>Manage Online Sessions.</h2>
+
+    <p class="muted">
+        Create, edit, publish and unpublish sessions.
+        Published future sessions appear on the homepage.
+        All times are in Malaysia Time (MYT).
+    </p>
+
+    <form id="guild-session-form">
+        <label for="session-title">
+            SESSION TITLE
+        </label>
+        <input
+            id="session-title"
+            type="text"
+            minlength="5"
+            maxlength="150"
+            required
+        >
+
+        <label for="session-description">
+            DESCRIPTION
+        </label>
+        <textarea
+            id="session-description"
+            rows="4"
+            maxlength="1200"
+        ></textarea>
+
+        <label for="session-start">
+            SESSION DATE & TIME (MYT)
+        </label>
+        <input
+            id="session-start"
+            type="datetime-local"
+            required
+        >
+
+        <label for="session-duration">
+            DURATION (MINUTES)
+        </label>
+        <input
+            id="session-duration"
+            type="number"
+            min="15"
+            max="480"
+            value="60"
+            required
+        >
+
+        <label for="session-signup">
+            REGISTRATION URL (OPTIONAL)
+        </label>
+        <input
+            id="session-signup"
+            type="url"
+            placeholder="https://"
+        >
+
+        <div>
+            <button id="session-save" type="submit">
+                CREATE SESSION
+            </button>
+
+            <button
+                id="session-cancel"
+                type="button"
+                class="secondary"
+                hidden
+            >
+                CANCEL EDIT
+            </button>
+        </div>
+    </form>
+
+    <p id="session-message" role="status"></p>
+
+    <h3>Scheduled Sessions</h3>
+
+    <button
+        id="session-refresh"
+        type="button"
+        class="secondary"
+    >
+        REFRESH SESSIONS
+    </button>
+
+    <div id="session-list">
+        Loading sessions...
+    </div>
+</section>
+
         </section>
     </main>
 
@@ -445,5 +546,295 @@
 
         initialize();
     </script>
+    
+<script type="module">
+    import { supabase } from './supabase-client.js';
+
+    // =========================================
+    // ONLINE SESSION ADMIN
+    // =========================================
+
+    const $ = (id) => document.getElementById(id);
+
+    const form = $('guild-session-form');
+    const message = $('session-message');
+    const sessionList = $('session-list');
+
+    let editingId = null;
+
+    function setMessage(text) {
+        message.textContent = text;
+    }
+
+    function malaysiaDate(isoDate) {
+        return new Intl.DateTimeFormat('en-MY', {
+            timeZone: 'Asia/Kuala_Lumpur',
+            dateStyle: 'medium',
+            timeStyle: 'short'
+        }).format(new Date(isoDate));
+    }
+
+    function toMalaysiaInput(isoDate) {
+        const malaysiaTime =
+            new Date(isoDate).getTime() +
+            (8 * 60 * 60 * 1000);
+
+        return new Date(malaysiaTime)
+            .toISOString()
+            .slice(0, 16);
+    }
+
+    function resetForm() {
+        editingId = null;
+        form.reset();
+
+        $('session-duration').value = '60';
+        $('session-save').textContent = 'CREATE SESSION';
+        $('session-cancel').hidden = true;
+    }
+
+    function startEditing(session) {
+        editingId = session.id;
+
+        $('session-title').value = session.title;
+        $('session-description').value =
+            session.description || '';
+
+        $('session-start').value =
+            toMalaysiaInput(session.starts_at);
+
+        $('session-duration').value =
+            session.duration_minutes;
+
+        $('session-signup').value =
+            session.signup_url || '';
+
+        $('session-save').textContent = 'SAVE CHANGES';
+        $('session-cancel').hidden = false;
+
+        form.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+
+    async function loadSessions() {
+        sessionList.textContent = 'Loading sessions...';
+
+        const { data, error } = await supabase
+            .from('guild_online_sessions')
+            .select(
+                'id,title,description,starts_at,' +
+                'duration_minutes,signup_url,is_published'
+            )
+            .order('starts_at', {
+                ascending: false
+            });
+
+        if (error) {
+            sessionList.textContent = error.message;
+            return;
+        }
+
+        sessionList.replaceChildren();
+
+        if (!data.length) {
+            sessionList.textContent =
+                'No sessions created yet.';
+            return;
+        }
+
+        for (const session of data) {
+            const card = document.createElement('article');
+            card.className = 'card';
+
+            const title = document.createElement('h3');
+            title.textContent = session.title;
+
+            const details = document.createElement('p');
+            details.className = 'muted';
+
+            details.textContent =
+                `${malaysiaDate(session.starts_at)} MYT\n` +
+                `${session.duration_minutes} minutes\n` +
+                (session.is_published
+                    ? 'STATUS: PUBLISHED'
+                    : 'STATUS: DRAFT');
+
+            details.style.whiteSpace = 'pre-line';
+
+            const editButton =
+                document.createElement('button');
+
+            editButton.type = 'button';
+            editButton.className = 'secondary';
+            editButton.textContent = 'EDIT';
+
+            editButton.addEventListener('click', () => {
+                startEditing(session);
+            });
+
+            const publishButton =
+                document.createElement('button');
+
+            publishButton.type = 'button';
+
+            publishButton.textContent =
+                session.is_published
+                    ? 'UNPUBLISH'
+                    : 'PUBLISH';
+
+            publishButton.addEventListener(
+                'click',
+                async () => {
+                    publishButton.disabled = true;
+
+                    const { error: updateError } =
+                        await supabase
+                            .from('guild_online_sessions')
+                            .update({
+                                is_published:
+                                    !session.is_published
+                            })
+                            .eq('id', session.id);
+
+                    if (updateError) {
+                        setMessage(updateError.message);
+                    } else {
+                        setMessage('Session updated.');
+                    }
+
+                    await loadSessions();
+                }
+            );
+
+            card.append(
+                title,
+                details,
+                editButton,
+                publishButton
+            );
+
+            sessionList.append(card);
+        }
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const saveButton = $('session-save');
+        saveButton.disabled = true;
+
+        try {
+            const startInput =
+                $('session-start').value;
+
+            // Interpret input as Malaysia Time (UTC+8).
+            const startDate = new Date(
+                `${startInput}:00+08:00`
+            );
+
+            if (Number.isNaN(startDate.getTime())) {
+                throw new Error('Invalid session date.');
+            }
+
+            const signupUrl =
+                $('session-signup').value.trim();
+
+            if (signupUrl) {
+                const parsed = new URL(signupUrl);
+
+                if (parsed.protocol !== 'https:') {
+                    throw new Error(
+                        'Registration URL must use HTTPS.'
+                    );
+                }
+            }
+
+            const values = {
+                title: $('session-title').value.trim(),
+                description:
+                    $('session-description').value.trim(),
+                starts_at: startDate.toISOString(),
+                duration_minutes: Number(
+                    $('session-duration').value
+                ),
+                signup_url: signupUrl || null
+            };
+
+            let result;
+
+            if (editingId) {
+                result = await supabase
+                    .from('guild_online_sessions')
+                    .update(values)
+                    .eq('id', editingId);
+            } else {
+                if (startDate.getTime() <= Date.now()) {
+                    throw new Error(
+                        'Choose a future session date.'
+                    );
+                }
+
+                result = await supabase
+                    .from('guild_online_sessions')
+                    .insert(values);
+            }
+
+            if (result.error) {
+                throw result.error;
+            }
+
+            setMessage(
+                editingId
+                    ? 'Session updated successfully.'
+                    : 'Draft created. Publish when ready.'
+            );
+
+            resetForm();
+            await loadSessions();
+
+        } catch (error) {
+            setMessage(
+                'Unable to save session: ' +
+                error.message
+            );
+        } finally {
+            saveButton.disabled = false;
+        }
+    });
+
+    $('session-cancel').addEventListener(
+        'click',
+        resetForm
+    );
+
+    $('session-refresh').addEventListener(
+        'click',
+        loadSessions
+    );
+
+    async function initializeSessionsAdmin() {
+        const { data: auth } =
+            await supabase.auth.getUser();
+
+        if (!auth?.user) return;
+
+        const { data: allowed, error } =
+            await supabase.rpc(
+                'is_herstacks_payment_admin'
+            );
+
+        if (error || allowed !== true) {
+            return;
+        }
+
+        $('guild-sessions-admin').hidden = false;
+
+        await loadSessions();
+    }
+
+    initializeSessionsAdmin();
+</script>
 </body>
 </html>
