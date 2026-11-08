@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>HerStacks Admin | Payment Verification</title>
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --pink: #f04da5;
+            --bg: #090909;
+            --panel: #151315;
+            --line: #45323e;
+            --text: #f6f2f5;
+            --muted: #b5a9b2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 15px/1.6 system-ui, sans-serif;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: auto;
+            padding: 40px 20px 90px;
+        }
+
+        h1 {
+            font-size: clamp(28px, 5vw, 44px);
+        }
+
+        .eyebrow {
+            font: 12px monospace;
+            color: var(--pink);
+        }
+
+        .card {
+            padding: 24px;
+            margin: 18px 0;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            overflow-wrap: anywhere;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        label {
+            display: block;
+            margin-top: 14px;
+            font: 700 12px monospace;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            background: var(--bg);
+            color: white;
+            border: 1px solid var(--line);
+            border-radius: 0;
+        }
+
+        button,
+        .button {
+            display: inline-block;
+            padding: 12px 18px;
+            margin: 8px 8px 0 0;
+            background: var(--pink);
+            color: #090909;
+            border: 1px solid var(--pink);
+            border-radius: 0;
+            font: 700 12px monospace;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .secondary {
+            background: transparent;
+            color: var(--text);
+            border-color: var(--line);
+        }
+
+        .check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .check input {
+            width: auto;
+        }
+
+        .receipt-link {
+            display: block;
+            margin: 12px 0;
+            color: var(--pink);
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="eyebrow">
+            KD HERSTACKS / ADMIN CONSOLE
+        </div>
+
+        <h1>Payment Verification.</h1>
+
+        <p class="muted">
+            Manual DuitNow payment approvals.
+            Confirm every transaction in the
+            Nexaris business bank account first.
+        </p>
+
+        <p id="admin-status" role="status">
+            Checking administrator access...
+        </p>
+
+        <section id="admin-content" hidden>
+            <button id="refresh" class="secondary">
+                REFRESH SUBMISSIONS
+            </button>
+
+            <div id="payments"></div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase-client.js';
+
+        const $ = (id) => document.getElementById(id);
+
+        const bucket = 'herstacks-payment-receipts';
+
+        function element(tag, text) {
+            const node = document.createElement(tag);
+
+            if (text !== undefined) {
+                node.textContent = String(text);
+            }
+
+            return node;
+        }
+
+        function addField(parent, labelText, input) {
+            const label = element('label', labelText);
+
+            parent.append(label, input);
+
+            return input;
+        }
+
+        async function loadPayments() {
+            $('admin-status').textContent =
+                'Loading payment submissions...';
+
+            const { data, error } = await supabase
+                .from('guild_payment_submissions')
+                .select(
+                    'id,user_id,payer_name,bank_reference,' +
+                    'receipt_path,status,submitted_at,admin_note'
+                )
+                .order('submitted_at', {
+                    ascending: false
+                })
+                .limit(50);
+
+            if (error) {
+                $('admin-status').textContent = error.message;
+                return;
+            }
+
+            const container = $('payments');
+
+            container.replaceChildren();
+
+            $('admin-status').textContent =
+                `${data.length} submission(s) found.`;
+
+            if (!data.length) {
+                container.append(
+                    element('p', 'No submissions yet.')
+                );
+
+                return;
+            }
+
+            for (const payment of data) {
+                container.append(
+                    createPaymentCard(payment)
+                );
+            }
+        }
+
+        function createPaymentCard(payment) {
+            const card = element('article');
+
+            card.className = 'card';
+
+            const title = element(
+                'h2',
+                payment.payer_name
+            );
+
+            const details = element(
+                'p',
+                `Status: ${payment.status}\n` +
+                `Reference: ${payment.bank_reference}\n` +
+                `Member ID: ${payment.user_id}\n` +
+                `Submitted: ${new Date(
+                    payment.submitted_at
+                ).toLocaleString('en-MY')}`
+            );
+
+            details.style.whiteSpace = 'pre-wrap';
+
+            const receiptButton = element(
+                'button',
+                'GENERATE SECURE RECEIPT LINK'
+            );
+
+            receiptButton.type = 'button';
+            receiptButton.className = 'secondary';
+
+            const receiptLink = element(
+                'a',
+                'OPEN PRIVATE RECEIPT'
+            );
+
+            receiptLink.className = 'receipt-link';
+            receiptLink.target = '_blank';
+            receiptLink.rel = 'noopener noreferrer';
+            receiptLink.hidden = true;
+
+            receiptButton.addEventListener(
+                'click',
+                async () => {
+                    receiptButton.disabled = true;
+
+                    const { data, error } =
+                        await supabase.storage
+                            .from(bucket)
+                            .createSignedUrl(
+                                payment.receipt_path,
+                                300
+                            );
+
+                    receiptButton.disabled = false;
+
+                    if (error) {
+                        alert(error.message);
+                        return;
+                    }
+
+                    receiptLink.href = data.signedUrl;
+                    receiptLink.hidden = false;
+                }
+            );
+
+            card.append(
+                title,
+                details,
+                receiptButton,
+                receiptLink
+            );
+
+            if (payment.status !== 'pending') {
+                card.append(
+                    element(
+                        'p',
+                        payment.admin_note || 'Already reviewed.'
+                    )
+                );
+
+                return card;
+            }
+
+            const bankReference = element('input');
+
+            bankReference.placeholder =
+                'Verified reference from bank records';
+
+            bankReference.maxLength = 120;
+
+            const note = element('textarea');
+
+            note.placeholder =
+                'Admin notes or rejection reason';
+
+            note.maxLength = 500;
+
+            const confirmed = element('input');
+
+            confirmed.type = 'checkbox';
+
+            const checkLabel = element('label');
+
+            checkLabel.className = 'check';
+
+            checkLabel.append(
+                confirmed,
+                element(
+                    'span',
+                    'I verified the RM50 incoming bank transaction'
+                )
+            );
+
+            addField(
+                card,
+                'VERIFIED BANK REFERENCE',
+                bankReference
+            );
+
+            addField(card, 'ADMIN NOTES', note);
+
+            card.append(checkLabel);
+
+            const approve = element(
+                'button',
+                'APPROVE PAYMENT'
+            );
+
+            const reject = element(
+                'button',
+                'REJECT PAYMENT'
+            );
+
+            reject.className = 'secondary';
+
+            const result = element('p');
+
+            result.setAttribute('role', 'status');
+
+            async function review(decision) {
+                approve.disabled = true;
+                reject.disabled = true;
+
+                result.textContent =
+                    'Saving payment review...';
+
+                try {
+                    const { data, error } = await supabase.rpc(
+                        'review_herstacks_payment',
+                        {
+                            p_submission_id: payment.id,
+                            p_decision: decision,
+                            p_bank_confirmed: confirmed.checked,
+                            p_verified_reference:
+                                bankReference.value.trim() || null,
+                            p_note: note.value.trim() || null
+                        }
+                    );
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    result.textContent =
+                        `Payment ${data.status}.`;
+
+                    await loadPayments();
+                } catch (error) {
+                    result.textContent =
+                        'Review failed: ' + error.message;
+
+                    approve.disabled = false;
+                    reject.disabled = false;
+                }
+            }
+
+            approve.addEventListener(
+                'click',
+                () => review('approve')
+            );
+
+            reject.addEventListener(
+                'click',
+                () => review('reject')
+            );
+
+            card.append(
+                approve,
+                reject,
+                result
+            );
+
+            return card;
+        }
+
+        async function initialize() {
+            const { data: auth, error: authError } =
+                await supabase.auth.getUser();
+
+            if (authError || !auth.user) {
+                $('admin-status').textContent =
+                    'Sign in to your admin account first.';
+                return;
+            }
+
+            const { data: isAdmin, error } =
+                await supabase.rpc(
+                    'is_herstacks_payment_admin'
+                );
+
+            if (error || isAdmin !== true) {
+                $('admin-status').textContent =
+                    'Administrator access required.';
+                return;
+            }
+
+            $('admin-content').hidden = false;
+
+            await loadPayments();
+        }
+
+        $('refresh').addEventListener(
+            'click',
+            loadPayments
+        );
+
+        initialize();
+    </script>
+</body>
+</html>
