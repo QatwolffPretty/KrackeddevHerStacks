@@ -1,0 +1,444 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>HerOps Payment | KD HerStacks</title>
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #090909;
+            --panel: #151315;
+            --pink: #f04da5;
+            --text: #f6f2f5;
+            --muted: #b5a9b2;
+            --line: #45323e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 16px/1.6 system-ui, sans-serif;
+        }
+
+        main {
+            max-width: 780px;
+            margin: auto;
+            padding: 46px 20px 90px;
+        }
+
+        a {
+            color: var(--pink);
+        }
+
+        .eyebrow {
+            color: var(--pink);
+            font: 12px monospace;
+            letter-spacing: 0.12em;
+        }
+
+        h1 {
+            font-size: clamp(30px, 6vw, 48px);
+            line-height: 1.15;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            padding: 24px;
+            margin-top: 22px;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .price {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--pink);
+            margin: 12px 0;
+        }
+
+        .qr-image {
+            display: block;
+            width: 100%;
+            max-width: 360px;
+            margin: 24px auto;
+        }
+
+        label {
+            display: block;
+            margin: 18px 0 6px;
+            font: 700 12px monospace;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            background: #090909;
+            color: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 0;
+        }
+
+        button {
+            margin-top: 22px;
+            padding: 14px 20px;
+            background: var(--pink);
+            color: #090909;
+            border: 0;
+            border-radius: 0;
+            font: 700 12px monospace;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #status {
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <a href="./cyberlabs.html">
+            ← BACK TO CYBERLABS
+        </a>
+
+        <p class="eyebrow">
+            HEROPS / PRACTICAL CYBERSECURITY
+        </p>
+
+        <h1>Unlock Your Learning Path.</h1>
+
+        <div class="price">
+            RM50
+        </div>
+
+        <p class="muted">
+            One-time access to HerOps Practical V2,
+            developed using Hacktivist Haven's
+            cybersecurity learning modules.
+        </p>
+
+        <p class="muted">
+            Programme fees support KD HerStacks
+            guild events and learning activities.
+        </p>
+
+        <section class="panel">
+            <h2>Payment Status</h2>
+
+            <p id="status" role="status">
+                Checking your account...
+            </p>
+        </section>
+
+        <section id="payment-section" class="panel" hidden>
+            <h2>01 / Pay with DuitNow</h2>
+
+            <p>
+                Pay RM50 to:
+                <strong>Nexaris Research Solution</strong>
+            </p>
+
+            <img
+                class="qr-image"
+                src="./nexaris-duitnow-qr.jpg"
+                alt="Nexaris Research Solution DuitNow QR"
+            >
+
+            <p class="muted">
+                Scan with a participating banking or
+                e-wallet app. Confirm the business name
+                and RM50 amount before paying.
+            </p>
+
+            <h2>02 / Submit Your Receipt</h2>
+
+            <form id="payment-form">
+                <label for="payer-name">
+                    PAYER NAME
+                </label>
+
+                <input
+                    id="payer-name"
+                    maxlength="120"
+                    required
+                >
+
+                <label for="bank-reference">
+                    TRANSACTION REFERENCE
+                </label>
+
+                <input
+                    id="bank-reference"
+                    maxlength="120"
+                    required
+                >
+
+                <label for="receipt">
+                    PAYMENT RECEIPT
+                </label>
+
+                <input
+                    id="receipt"
+                    type="file"
+                    accept="image/jpeg,image/png,application/pdf"
+                    required
+                >
+
+                <p class="muted">
+                    JPG, PNG or PDF only. Maximum 5 MB.
+                    Receipts are stored privately.
+                </p>
+
+                <button id="submit-button" type="submit">
+                    SUBMIT FOR VERIFICATION
+                </button>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h2>What Happens Next?</h2>
+
+            <p class="muted">
+                Admin will check the actual bank
+                transaction against your receipt.
+                Approved payments receive one-time
+                programme access.
+            </p>
+        </section>
+    </main>
+
+    <script type="module">
+        import { supabase } from './supabase-client.js';
+
+        const $ = (id) => document.getElementById(id);
+
+        const programme = 'herops-practical-v2';
+        const bucket = 'herstacks-payment-receipts';
+
+        let user = null;
+        let paymentEnabled = false;
+
+        function show(message) {
+            $('status').textContent = message;
+        }
+
+        async function loadPaymentStatus() {
+            $('payment-section').hidden = true;
+
+            const { data: auth, error: authError } =
+                await supabase.auth.getUser();
+
+            if (authError || !auth.user) {
+                show('Please sign in through My Account first.');
+                return;
+            }
+
+            user = auth.user;
+
+            const { data: config, error: configError } =
+                await supabase
+                    .from('guild_programmes')
+                    .select('payment_enabled,price_sen')
+                    .eq('slug', programme)
+                    .single();
+
+            if (configError) {
+                show(configError.message);
+                return;
+            }
+
+            paymentEnabled =
+                config.payment_enabled === true;
+
+            const { data: access, error: accessError } =
+                await supabase
+                    .from('guild_programme_access')
+                    .select('granted_at')
+                    .eq('user_id', user.id)
+                    .eq('programme_slug', programme)
+                    .maybeSingle();
+
+            if (accessError) {
+                show(accessError.message);
+                return;
+            }
+
+            if (access) {
+                show(
+                    'ACCESS APPROVED\n' +
+                    'Your HerOps Practical access has been granted.'
+                );
+
+                return;
+            }
+
+            const { data: payments, error: paymentError } =
+                await supabase
+                    .from('guild_payment_submissions')
+                    .select('status,admin_note,submitted_at')
+                    .eq('programme_slug', programme)
+                    .order('submitted_at', {
+                        ascending: false
+                    })
+                    .limit(1);
+
+            if (paymentError) {
+                show(paymentError.message);
+                return;
+            }
+
+            const latest = payments?.[0];
+
+            if (latest?.status === 'pending') {
+                show(
+                    'PENDING VERIFICATION\n' +
+                    'Your receipt has been submitted. ' +
+                    'Admin review is required.'
+                );
+
+                return;
+            }
+
+            if (!paymentEnabled) {
+                show(
+                    'ENROLMENT NOT OPEN YET\n' +
+                    'Payment submission is currently disabled. ' +
+                    'Please do not make payment yet.'
+                );
+
+                return;
+            }
+
+            if (config.price_sen !== 5000) {
+                show('Payment configuration requires review.');
+                return;
+            }
+
+            if (latest?.status === 'rejected') {
+                show(
+                    'PREVIOUS SUBMISSION REJECTED\n' +
+                    (latest.admin_note || 'Please contact admin.') +
+                    '\nYou may submit a new receipt.'
+                );
+            } else {
+                show(
+                    'READY FOR PAYMENT\n' +
+                    'Pay RM50 and submit your receipt below.'
+                );
+            }
+
+            $('payment-section').hidden = false;
+        }
+
+        $('payment-form').addEventListener(
+            'submit',
+            async (event) => {
+                event.preventDefault();
+
+                if (!user || !paymentEnabled) {
+                    return;
+                }
+
+                const file = $('receipt').files[0];
+                const button = $('submit-button');
+
+                const mimeTypes = {
+                    'image/jpeg': 'jpg',
+                    'image/png': 'png',
+                    'application/pdf': 'pdf'
+                };
+
+                const extension = mimeTypes[file?.type];
+
+                if (
+                    !file ||
+                    !extension ||
+                    file.size > 5242880
+                ) {
+                    show(
+                        'Invalid receipt. Use JPG, PNG or PDF ' +
+                        'under 5 MB.'
+                    );
+
+                    return;
+                }
+
+                button.disabled = true;
+                show('Uploading receipt securely...');
+
+                try {
+                    const path =
+                        `${user.id}/${crypto.randomUUID()}.${extension}`;
+
+                    const { error: uploadError } =
+                        await supabase.storage
+                            .from(bucket)
+                            .upload(path, file, {
+                                contentType: file.type,
+                                upsert: false
+                            });
+
+                    if (uploadError) {
+                        throw uploadError;
+                    }
+
+                    const { error: insertError } =
+                        await supabase
+                            .from('guild_payment_submissions')
+                            .insert({
+                                payer_name:
+                                    $('payer-name').value.trim(),
+
+                                bank_reference:
+                                    $('bank-reference').value.trim(),
+
+                                receipt_path: path
+                            });
+
+                    if (insertError) {
+                        throw insertError;
+                    }
+
+                    await loadPaymentStatus();
+                } catch (error) {
+                    show(
+                        'Submission failed: ' +
+                        error.message +
+                        '\nIf your receipt uploaded but submission ' +
+                        'failed, contact admin before retrying.'
+                    );
+                } finally {
+                    button.disabled = false;
+                }
+            }
+        );
+
+        loadPaymentStatus();
+    </script>
+</body>
+</html>
