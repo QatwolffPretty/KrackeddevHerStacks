@@ -1,0 +1,469 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Login Defence Lab | KD HerStacks</title>
+
+    <link rel="icon" href="./favicon.png">
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./cyberlabs.css">
+
+    <style>
+        .lab-code-editor {
+            width: 100%;
+            min-height: 280px;
+            padding: 18px;
+            resize: vertical;
+            background: #080808;
+            color: #f4d4e6;
+            border: 1px solid #59344a;
+            border-radius: 0;
+            font: 13px/1.8 ui-monospace, monospace;
+            tab-size: 2;
+        }
+
+        .lab-results {
+            padding: 20px;
+            background: #0a090b;
+            border: 1px solid #59344a;
+            color: #f3e5ed;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font: 13px/1.8 ui-monospace, monospace;
+        }
+
+        .lab-preview-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .lab-hint {
+            margin-top: 20px;
+            color: #f04da5;
+        }
+
+        .lab-hint summary {
+            cursor: pointer;
+        }
+
+        .lab-muted {
+            line-height: 1.7;
+        }
+
+        .lab-page .lab-section {
+            margin-top: 22px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="nav wrap">
+            <a class="brand" href="./index.html">
+                <img
+                    src="./herstacks-logo.png"
+                    alt="KD HerStacks"
+                >
+            </a>
+
+            <div class="nav-links">
+                <a href="./cyberlabs.html">
+                    BACK TO CYBERLABS
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="wrap lab-page">
+        <div class="num">
+            HEROPS / PRACTICAL V2 / FREE PREVIEW
+        </div>
+
+        <div class="lab-hero">
+            <div>
+                <h1>
+                    LOGIN <span>DEFENCE.</span>
+                </h1>
+
+                <p class="lab-muted">
+                    Build a defence against repeated
+                    failed login attempts.
+                </p>
+            </div>
+        </div>
+
+        <section class="lab-section">
+            <div class="num">
+                01 / YOUR MISSION
+            </div>
+
+            <h2>PROTECT A LOGIN SYSTEM.</h2>
+
+            <p class="lab-muted">
+                Write two JavaScript functions for
+                a fictional authentication system.
+            </p>
+
+            <p class="lab-muted">
+                Rule A: Block login after 3 or more
+                failed attempts.
+            </p>
+
+            <p class="lab-muted">
+                Rule B: Reset failed attempts to 0
+                after a successful login.
+            </p>
+
+            <p class="lab-muted">
+                All test data is simulated locally.
+                No real accounts or login services
+                are contacted.
+            </p>
+        </section>
+
+        <section class="lab-section">
+            <div class="num">
+                02 / CODE WORKSPACE
+            </div>
+
+            <h2>WRITE YOUR DEFENCE.</h2>
+
+            <label for="code-editor">
+                JAVASCRIPT EDITOR
+            </label>
+
+            <textarea
+                id="code-editor"
+                class="lab-code-editor"
+                spellcheck="false"
+                autocapitalize="off"
+                autocorrect="off"
+                autocomplete="off"
+            >function shouldBlock(failedAttempts) {
+    // TODO: block at 3 or more failures.
+    return false;
+}
+
+function resetOnSuccess(
+    failedAttempts,
+    loginSucceeded
+) {
+    // TODO: reset counter after success.
+    return failedAttempts;
+}</textarea>
+
+            <div class="lab-preview-actions">
+                <button
+                    id="run-tests"
+                    class="lab-button"
+                    type="button"
+                >
+                    RUN TESTS →
+                </button>
+
+                <button
+                    id="reset-code"
+                    class="lab-button lab-button-outline"
+                    type="button"
+                >
+                    RESET CODE
+                </button>
+            </div>
+        </section>
+
+        <section class="lab-section">
+            <div class="num">
+                03 / TEST RESULTS
+            </div>
+
+            <h2>YOUR RESULTS.</h2>
+
+            <div
+                id="test-output"
+                class="lab-results"
+                role="status"
+                aria-live="polite"
+            >
+                No tests run yet.
+            </div>
+
+            <details class="lab-hint">
+                <summary>NEED A HINT?</summary>
+
+                <p class="lab-muted">
+                    For the first function, compare
+                    failedAttempts with 3 using >=.
+                </p>
+
+                <p class="lab-muted">
+                    For the second function, check
+                    loginSucceeded before deciding
+                    which value to return.
+                </p>
+            </details>
+        </section>
+
+        <section class="lab-section">
+            <div class="num">
+                04 / CONTINUE LEARNING
+            </div>
+
+            <h2>READY FOR MORE?</h2>
+
+            <p class="lab-muted">
+                The full HerOps Practical pathway
+                will include coding challenges,
+                security investigations and
+                defensive exercises.
+            </p>
+
+            <p class="lab-muted">
+                This preview is local practice only.
+                It does not award XP, unlock paid
+                lessons or issue certificates.
+            </p>
+
+            <a
+                href="./herops-payment.html"
+                class="lab-button"
+            >
+                EXPLORE PRACTICAL V2 →
+            </a>
+        </section>
+    </main>
+
+    <script>
+        const editor = document.getElementById(
+            'code-editor'
+        );
+
+        const output = document.getElementById(
+            'test-output'
+        );
+
+        const runButton = document.getElementById(
+            'run-tests'
+        );
+
+        const starterCode = editor.value;
+
+        // The code runner uses an isolated iframe
+        // with an opaque origin and no network access.
+        //
+        // This is only for local practice.
+        // Never use client-side results for XP
+        // or certificate authorization.
+
+        const runnerDocument = `
+            <!doctype html>
+
+            <meta
+                http-equiv="Content-Security-Policy"
+                content="default-src 'none';
+                         script-src 'unsafe-inline' 'unsafe-eval';
+                         connect-src 'none';
+                         form-action 'none'"
+            >
+
+            <script>
+                window.addEventListener(
+                    'message',
+                    (event) => {
+                        if (
+                            event.data?.kind !== 'run'
+                        ) {
+                            return;
+                        }
+
+                        try {
+                            const functions = new Function(
+                                event.data.source +
+                                '; return { shouldBlock, resetOnSuccess };'
+                            )();
+
+                            const tests = [
+                                ['0 failures',
+                                    functions.shouldBlock(0), false],
+
+                                ['1 failure',
+                                    functions.shouldBlock(1), false],
+
+                                ['2 failures',
+                                    functions.shouldBlock(2), false],
+
+                                ['3 failures',
+                                    functions.shouldBlock(3), true],
+
+                                ['5 failures',
+                                    functions.shouldBlock(5), true],
+
+                                ['Success resets 2',
+                                    functions.resetOnSuccess(2, true), 0],
+
+                                ['Success resets 5',
+                                    functions.resetOnSuccess(5, true), 0],
+
+                                ['Failure keeps 2',
+                                    functions.resetOnSuccess(2, false), 2],
+
+                                ['Failure keeps 0',
+                                    functions.resetOnSuccess(0, false), 0]
+                            ];
+
+                            parent.postMessage({
+                                kind: 'results',
+                                id: event.data.id,
+                                rows: tests.map(
+                                    ([name, actual, expected]) => ({
+                                        name,
+                                        actual: String(actual),
+                                        expected: String(expected),
+                                        passed: actual === expected
+                                    })
+                                )
+                            }, '*');
+
+                        } catch (error) {
+                            parent.postMessage({
+                                kind: 'results',
+                                id: event.data.id,
+                                error: String(error.message)
+                            }, '*');
+                        }
+                    }
+                );
+            <\/script>
+        `;
+
+        function runTests() {
+            runButton.disabled = true;
+
+            output.textContent =
+                'Running local test cases...';
+
+            const id = crypto.randomUUID();
+
+            const frame = document.createElement(
+                'iframe'
+            );
+
+            frame.setAttribute(
+                'sandbox',
+                'allow-scripts'
+            );
+
+            frame.hidden = true;
+            frame.srcdoc = runnerDocument;
+
+            let timer;
+            let finished = false;
+
+            function cleanup() {
+                if (finished) return;
+
+                finished = true;
+
+                clearTimeout(timer);
+
+                window.removeEventListener(
+                    'message',
+                    receive
+                );
+
+                frame.remove();
+                runButton.disabled = false;
+            }
+
+            function receive(event) {
+                if (
+                    event.source !== frame.contentWindow
+                ) {
+                    return;
+                }
+
+                if (
+                    event.data?.kind !== 'results' ||
+                    event.data.id !== id
+                ) {
+                    return;
+                }
+
+                if (event.data.error) {
+                    output.textContent =
+                        'CODE ERROR / ' +
+                        event.data.error;
+
+                    cleanup();
+                    return;
+                }
+
+                const rows = event.data.rows;
+
+                const passed = rows.filter(
+                    row => row.passed
+                ).length;
+
+                output.textContent =
+                    `${passed}/${rows.length} TESTS PASSED\n\n` +
+                    rows.map(row =>
+                        `${row.passed ? 'PASS' : 'FAIL'} / ` +
+                        `${row.name} / ` +
+                        `expected ${row.expected}, ` +
+                        `got ${row.actual}`
+                    ).join('\n');
+
+                cleanup();
+            }
+
+            window.addEventListener(
+                'message',
+                receive
+            );
+
+            frame.addEventListener(
+                'load',
+                () => {
+                    frame.contentWindow.postMessage({
+                        kind: 'run',
+                        id,
+                        source: editor.value
+                    }, '*');
+                },
+                { once: true }
+            );
+
+            document.body.append(frame);
+
+            timer = setTimeout(() => {
+                output.textContent =
+                    'Test timed out. Check your code.';
+
+                cleanup();
+            }, 2500);
+        }
+
+        runButton.addEventListener(
+            'click',
+            runTests
+        );
+
+        document.getElementById(
+            'reset-code'
+        ).addEventListener('click', () => {
+            editor.value = starterCode;
+
+            output.textContent =
+                'Code reset. No tests run yet.';
+        });
+    </script>
+</body>
+</html>
