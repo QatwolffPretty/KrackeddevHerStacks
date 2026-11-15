@@ -465,5 +465,130 @@ function resetOnSuccess(
                 'Code reset. No tests run yet.';
         });
     </script>
+    <script>
+    // =========================================
+    // HEROPS / SIMULATED TERMINAL ENGINE
+    // =========================================
+
+    (() => {
+        const form = document.getElementById(
+            'terminal-form'
+        );
+
+        const input = document.getElementById(
+            'terminal-input'
+        );
+
+        const output = document.getElementById(
+            'terminal-output'
+        );
+
+        const commands = {
+            help: [
+                'AVAILABLE COMMANDS',
+                'help           - Show commands',
+                'ls             - List training files',
+                'cat auth.log   - Read login events',
+                'inspect policy - Read lockout policy',
+                'simulate login - Run a login scenario',
+                'status         - Check investigation',
+                'clear          - Clear terminal'
+            ].join('\n'),
+
+            ls: 'auth.log  policy.conf  README.txt',
+
+            'cat auth.log': [
+                '[09:03:21] FAILED LOGIN / demo_user',
+                '[09:03:25] FAILED LOGIN / demo_user',
+                '[09:03:28] FAILED LOGIN / demo_user',
+                '[09:03:30] ACCOUNT LOCKED'
+            ].join('\n'),
+
+            'inspect policy': [
+                'AUTHENTICATION POLICY',
+                'Maximum failed attempts: 3',
+                'Action: Lock account',
+                'Successful login: Reset counter'
+            ].join('\n'),
+
+            'simulate login': [
+                'SIMULATION STARTED',
+                'Attempt 1: Failed',
+                'Attempt 2: Failed',
+                'Attempt 3: Failed',
+                'Result: Account locked',
+                '',
+                'Your task: Implement this behaviour',
+                'in the coding workspace.'
+            ].join('\n')
+        };
+
+        const completed = new Set();
+
+        function print(message) {
+            output.textContent += '\n\n' + message;
+
+            output.scrollTop = output.scrollHeight;
+        }
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const command = input.value
+                .trim()
+                .replace(/\s+/g, ' ')
+                .toLowerCase();
+
+            input.value = '';
+
+            if (!command) {
+                return;
+            }
+
+            if (command === 'clear') {
+                output.textContent =
+                    'TERMINAL CLEARED';
+                return;
+            }
+
+            print('$ ' + command);
+
+            if (command === 'status') {
+                print(
+                    `Investigation: ${completed.size}/3 tasks\n` +
+                    'Required: cat auth.log, ' +
+                    'inspect policy, simulate login'
+                );
+
+                return;
+            }
+
+            if (Object.hasOwn(commands, command)) {
+                print(commands[command]);
+
+                if ([
+                    'cat auth.log',
+                    'inspect policy',
+                    'simulate login'
+                ].includes(command)) {
+                    completed.add(command);
+                }
+
+                if (completed.size === 3) {
+                    print(
+                        'INVESTIGATION COMPLETE\n' +
+                        'Proceed to the coding workspace.'
+                    );
+                }
+
+                return;
+            }
+
+            print(
+                'Command not recognized. Type help.'
+            );
+        });
+    })();
+</script>
 </body>
 </html>
