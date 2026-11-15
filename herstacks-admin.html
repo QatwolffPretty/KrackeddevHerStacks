@@ -901,5 +901,496 @@
 
     initializeSessionsAdmin();
 </script>
+    
+<script type="module">
+    import { supabase } from './supabase-client.js';
+
+    // ==========================================
+    // UNIFIED ADMIN / PANEL MANAGEMENT
+    // ==========================================
+
+    const adminRoot = document.getElementById(
+        'admin-content'
+    );
+
+    const sessionPanel = document.getElementById(
+        'guild-sessions-admin'
+    );
+
+    const paymentRefresh = document.getElementById(
+        'refresh'
+    );
+
+    const paymentList = document.getElementById(
+        'payments'
+    );
+
+    function create(tag, text = '', className = '') {
+        const node = document.createElement(tag);
+
+        node.textContent = text;
+        node.className = className;
+
+        return node;
+    }
+
+    // Preserve the existing payment controls.
+    const paymentPanel = create('section');
+
+    paymentPanel.id = 'payments-admin-panel';
+
+    adminRoot.insertBefore(
+        paymentPanel,
+        paymentRefresh
+    );
+
+    paymentPanel.append(
+        create('h2', 'Payment Verification'),
+        paymentRefresh,
+        paymentList
+    );
+
+    // Create the community mission panel.
+    const missionPanel = create(
+        'section',
+        '',
+        'card'
+    );
+
+    missionPanel.id = 'missions-admin-panel';
+    missionPanel.hidden = true;
+
+    const missionTitle = create(
+        'h2',
+        'Community Missions & XP'
+    );
+
+    const missionDescription = create(
+        'p',
+        'Review community submissions and award XP.',
+        'muted'
+    );
+
+    const missionStatus = create('p');
+    missionStatus.setAttribute('role', 'status');
+
+    const missionSummary = create(
+        'div',
+        '',
+        'mission-summary'
+    );
+
+    const missionFilters = create(
+        'div',
+        '',
+        'mission-filters'
+    );
+
+    const missionList = create('div');
+
+    const refreshMissions = create(
+        'button',
+        'REFRESH MISSIONS',
+        'secondary'
+    );
+
+    refreshMissions.type = 'button';
+
+    missionPanel.append(
+        missionTitle,
+        missionDescription,
+        refreshMissions,
+        missionSummary,
+        missionFilters,
+        missionStatus,
+        missionList
+    );
+
+    adminRoot.append(missionPanel);
+
+    // ==========================================
+    // THREE ADMIN TABS
+    // ==========================================
+
+    const tabNavigation = create(
+        'nav',
+        '',
+        'admin-tabs'
+    );
+
+    tabNavigation.setAttribute(
+        'aria-label',
+        'Admin sections'
+    );
+
+    const tabs = [
+        {
+            key: 'payments',
+            label: 'PAYMENTS'
+        },
+        {
+            key: 'sessions',
+            label: 'ONLINE SESSIONS'
+        },
+        {
+            key: 'missions',
+            label: 'MISSIONS / XP'
+        }
+    ];
+
+    const tabButtons = new Map();
+
+    function openTab(tabName) {
+        paymentPanel.hidden = tabName !== 'payments';
+
+        // Also use display because the existing
+        // session initializer may change `hidden`.
+        sessionPanel.hidden = tabName !== 'sessions';
+
+        sessionPanel.style.display =
+            tabName === 'sessions' ? '' : 'none';
+
+        missionPanel.hidden = tabName !== 'missions';
+
+        for (const [key, button] of tabButtons) {
+            button.setAttribute(
+                'aria-selected',
+                String(key === tabName)
+            );
+        }
+
+        if (tabName === 'missions') {
+            loadMissions();
+        }
+    }
+
+    for (const tab of tabs) {
+        const button = create(
+            'button',
+            tab.label
+        );
+
+        button.type = 'button';
+
+        button.addEventListener('click', () => {
+            openTab(tab.key);
+        });
+
+        tabButtons.set(tab.key, button);
+        tabNavigation.append(button);
+    }
+
+    adminRoot.prepend(tabNavigation);
+
+    // ==========================================
+    // MISSION APPROVAL / STATE
+    // ==========================================
+
+    let submissions = [];
+    let activities = new Map();
+    let missionFilter = 'pending';
+    let missionBusy = false;
+    let missionLoading = false;
+
+    const statuses = [
+        'pending',
+        'approved',
+        'rejected'
+    ];
+
+    for (const status of [
+        ...statuses,
+        'all'
+    ]) {
+        const button = create(
+            'button',
+            status.toUpperCase(),
+            'secondary'
+        );
+
+        button.type = 'button';
+
+        button.addEventListener('click', () => {
+            missionFilter = status;
+            renderMissions();
+        });
+
+        missionFilters.append(button);
+    }
+
+    function renderMissions() {
+        missionSummary.replaceChildren();
+        missionList.replaceChildren();
+
+        for (const status of statuses) {
+            const count = submissions.filter(
+                item => item.status === status
+            ).length;
+
+            const card = create('div');
+
+            card.append(
+                create('small', status.toUpperCase()),
+                create('strong', String(count))
+            );
+
+            missionSummary.append(card);
+        }
+
+        for (const button of missionFilters.children) {
+            const active =
+                button.textContent.toLowerCase() ===
+                missionFilter;
+
+            button.setAttribute(
+                'aria-pressed',
+                String(active)
+            );
+        }
+
+        const visible = submissions.filter(
+            item =>
+                missionFilter === 'all' ||
+                item.status === missionFilter
+        );
+
+        if (!visible.length) {
+            missionList.append(
+                create(
+                    'p',
+                    'No submissions found for this filter.',
+                    'muted'
+                )
+            );
+
+            return;
+        }
+
+        for (const item of visible) {
+            const activity = activities.get(
+                item.activity_id
+            );
+
+            const card = create(
+                'article',
+                '',
+                'card mission-entry'
+            );
+
+            const title = create(
+                'h3',
+                activity?.title || 'Unknown Activity'
+            );
+
+            const xp = Number(
+                activity?.xp_reward || 0
+            );
+
+            const details = create(
+                'p',
+                `Status: ${item.status}\n` +
+                `Member: ${item.user_id}\n` +
+                `XP reward: +${xp}\n` +
+                `Submitted: ${new Date(
+                    item.submitted_at
+                ).toLocaleString('en-MY')}`,
+                'muted'
+            );
+
+            details.style.whiteSpace = 'pre-wrap';
+
+            const submission = create(
+                'pre',
+                item.submission || 'No submission text.'
+            );
+
+            card.append(
+                title,
+                details,
+                submission
+            );
+
+            if (item.status === 'pending') {
+                const approve = create(
+                    'button',
+                    `APPROVE +${xp} XP`
+                );
+
+                const reject = create(
+                    'button',
+                    'REJECT',
+                    'secondary'
+                );
+
+                approve.type = 'button';
+                reject.type = 'button';
+
+                approve.addEventListener(
+                    'click',
+                    () => reviewMission(
+                        item,
+                        'approved'
+                    )
+                );
+
+                reject.addEventListener(
+                    'click',
+                    () => reviewMission(
+                        item,
+                        'rejected'
+                    )
+                );
+
+                card.append(approve, reject);
+            }
+
+            missionList.append(card);
+        }
+    }
+
+    // ==========================================
+    // LOAD MISSION SUBMISSIONS
+    // ==========================================
+
+    async function loadMissions() {
+        if (missionLoading) return;
+
+        missionLoading = true;
+
+        missionStatus.textContent =
+            'Checking mission permissions...';
+
+        try {
+            // Preserve the existing mission admin role.
+            const { data: allowed, error: roleError } =
+                await supabase.rpc(
+                    'is_herstacks_admin'
+                );
+
+            if (roleError) {
+                throw roleError;
+            }
+
+            if (allowed !== true) {
+                missionStatus.textContent =
+                    'Mission administrator access required.';
+
+                missionList.replaceChildren();
+                missionSummary.replaceChildren();
+
+                return;
+            }
+
+            const [completionResult, activityResult] =
+                await Promise.all([
+                    supabase
+                        .from('activity_completions')
+                        .select(
+                            'id,activity_id,user_id,' +
+                            'submission,status,submitted_at'
+                        )
+                        .order('submitted_at', {
+                            ascending: false
+                        })
+                        .limit(100),
+
+                    supabase
+                        .from('activities')
+                        .select('id,title,xp_reward')
+                ]);
+
+            if (completionResult.error) {
+                throw completionResult.error;
+            }
+
+            if (activityResult.error) {
+                throw activityResult.error;
+            }
+
+            submissions = completionResult.data || [];
+
+            activities = new Map(
+                (activityResult.data || []).map(
+                    activity => [
+                        activity.id,
+                        activity
+                    ]
+                )
+            );
+
+            missionStatus.textContent =
+                `${submissions.length} recent submission(s).`;
+
+            renderMissions();
+        } catch (error) {
+            missionStatus.textContent =
+                'Unable to load missions: ' +
+                error.message;
+        } finally {
+            missionLoading = false;
+        }
+    }
+
+    // ==========================================
+    // APPROVE / REJECT MISSION
+    // ==========================================
+
+    async function reviewMission(item, decision) {
+        if (missionBusy) return;
+
+        const activity = activities.get(
+            item.activity_id
+        );
+
+        const question = decision === 'approved'
+            ? `Approve "${activity?.title || 'mission'}" ` +
+              'and award XP?'
+            : 'Reject this mission submission?';
+
+        if (!window.confirm(question)) {
+            return;
+        }
+
+        missionBusy = true;
+
+        missionStatus.textContent =
+            'Processing mission review...';
+
+        try {
+            const { data, error } = await supabase.rpc(
+                'review_herstacks_submission',
+                {
+                    p_completion_id: item.id,
+                    p_decision: decision
+                }
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            missionStatus.textContent =
+                decision === 'approved'
+                    ? `Approved. +${data?.xp_awarded ?? 0} XP.`
+                    : 'Mission rejected.';
+
+            await loadMissions();
+        } catch (error) {
+            missionStatus.textContent =
+                'Review failed: ' +
+                error.message;
+        } finally {
+            missionBusy = false;
+        }
+    }
+
+    refreshMissions.addEventListener(
+        'click',
+        loadMissions
+    );
+
+    // Start on the payment tab.
+    openTab('payments');
+</script>
 </body>
 </html>
