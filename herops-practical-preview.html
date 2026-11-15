@@ -62,6 +62,47 @@
         .lab-page .lab-section {
             margin-top: 22px;
         }
+
+        /* HEROPS / SIMULATED TERMINAL */
+
+.cyber-terminal {
+    background: #080808;
+    border: 1px solid #59344a;
+    padding: 20px;
+    font-family: ui-monospace, monospace;
+}
+
+.terminal-output {
+    min-height: 200px;
+    max-height: 380px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: #e8dce4;
+    font: 13px/1.8 ui-monospace, monospace;
+}
+
+.terminal-command {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.terminal-command span {
+    color: #f04da5;
+    white-space: nowrap;
+}
+
+.terminal-command input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    outline: none;
+    color: #fff;
+    font: 13px ui-monospace, monospace;
+}
     </style>
 </head>
 
