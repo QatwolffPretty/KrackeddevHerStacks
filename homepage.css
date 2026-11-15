@@ -1915,3 +1915,19 @@ h2 span {
     flex-wrap: wrap;
   }
 }
+/* ==========================================
+   HERSTACKS / UPCOMING SESSIONS
+   RESPONSIVE CARD FIX
+========================================== */
+
+#upcoming-session-list > .pathway-card {
+    min-height: 0;
+}
+
+#upcoming-session-list > .pathway-card:only-child {
+    grid-column: 1 / -1;
+}
+
+#upcoming-session-list > p {
+    grid-column: 1 / -1;
+}
