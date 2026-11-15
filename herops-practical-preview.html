@@ -488,6 +488,230 @@ function resetOnSuccess(
             </a>
         </section>
     </main>
+    
+<script>
+(() => {
+    // ==========================================
+    // HEROPS / LOCAL PREVIEW PROGRESS
+    // ==========================================
+
+    const STORAGE_KEY = 'herstacks-lab01-preview-v1';
+
+    const REQUIRED_COMMANDS = [
+        'cat auth.log',
+        'inspect policy',
+        'simulate login'
+    ];
+
+    const $ = (id) => document.getElementById(id);
+
+    const editor = $('code-editor');
+    const reflection = $('lab-reflection');
+    const reflectionForm = $('lab-reflection-form');
+    const reflectionMessage = $('lab-reflection-message');
+
+    let saved = {};
+
+    try {
+        saved = JSON.parse(
+            localStorage.getItem(STORAGE_KEY)
+        ) || {};
+    } catch {
+        // Storage may be unavailable in private mode.
+    }
+
+    const state = {
+        commands: Array.isArray(saved.commands)
+            ? saved.commands.filter(
+                cmd => REQUIRED_COMMANDS.includes(cmd)
+            )
+            : [],
+
+        code: typeof saved.code === 'string'
+            ? saved.code.slice(0, 15000)
+            : editor.value,
+
+        testsPassed: Number.isInteger(saved.testsPassed)
+            ? saved.testsPassed
+            : 0,
+
+        testsTotal: 9,
+
+        testedCode: typeof saved.testedCode === 'string'
+            ? saved.testedCode
+            : '',
+
+        reflection: typeof saved.reflection === 'string'
+            ? saved.reflection.slice(0, 600)
+            : '',
+
+        reflectionSubmitted:
+            saved.reflectionSubmitted === true
+    };
+
+    editor.value = state.code;
+    reflection.value = state.reflection;
+
+    function save() {
+        try {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(state)
+            );
+        } catch {
+            // Continue without persistent local storage.
+        }
+    }
+
+    function isInvestigated() {
+        return REQUIRED_COMMANDS.every(
+            cmd => state.commands.includes(cmd)
+        );
+    }
+
+    function isCodeComplete() {
+        return state.testsPassed === 9 &&
+            state.testsTotal === 9 &&
+            state.testedCode === editor.value;
+    }
+
+    function isReflectionComplete() {
+        return state.reflectionSubmitted &&
+            state.reflection.trim().length >= 40;
+    }
+
+    function render() {
+        const investigation = isInvestigated();
+        const coding = isCodeComplete();
+        const reflectionDone = isReflectionComplete();
+
+        const count =
+            Number(investigation) +
+            Number(coding) +
+            Number(reflectionDone);
+
+        $('lab-step-terminal').textContent =
+            `Terminal investigation: ${state.commands.length}/3` +
+            (investigation ? ' ✓' : '');
+
+        $('lab-step-code').textContent =
+            `Coding tests: ${state.testsPassed}/9` +
+            (coding ? ' ✓' : '');
+
+        $('lab-step-reflection').textContent =
+            'Security reflection: ' +
+            (reflectionDone
+                ? 'SUBMITTED ✓'
+                : 'NOT SUBMITTED');
+
+        $('lab-progress-meter').value = count;
+
+        $('lab-progress-count').textContent =
+            `${count}/3 STAGES`;
+
+        $('lab-reflection-submit').disabled =
+            !investigation || !coding;
+
+        $('lab-complete').hidden = count !== 3;
+
+        $('lab-progress-message').textContent =
+            count === 3
+                ? 'LOCAL PREVIEW COMPLETE — no XP or certificate issued.'
+                : 'Complete the terminal, coding tests and reflection.';
+    }
+
+    window.HerOpsPreview = {
+        getCommands() {
+            return [...state.commands];
+        },
+
+        markCommand(command) {
+            if (!REQUIRED_COMMANDS.includes(command)) {
+                return;
+            }
+
+            if (!state.commands.includes(command)) {
+                state.commands.push(command);
+                save();
+            }
+
+            render();
+        },
+
+        recordTests(passed, total, testedCode) {
+            // Ignore stale test results when code changes.
+            if (testedCode !== editor.value) {
+                return;
+            }
+
+            state.testsPassed = Number(passed) || 0;
+            state.testsTotal = Number(total) || 0;
+            state.testedCode = testedCode;
+            state.code = editor.value;
+
+            save();
+            render();
+        },
+
+        invalidateTests() {
+            state.code = editor.value;
+            state.testsPassed = 0;
+            state.testsTotal = 9;
+            state.testedCode = '';
+
+            save();
+            render();
+        }
+    };
+
+    editor.addEventListener('input', () => {
+        window.HerOpsPreview.invalidateTests();
+    });
+
+    reflection.addEventListener('input', () => {
+        state.reflection = reflection.value.slice(0, 600);
+        state.reflectionSubmitted = false;
+
+        reflectionMessage.textContent = '';
+
+        save();
+        render();
+    });
+
+    reflectionForm.addEventListener(
+        'submit',
+        (event) => {
+            event.preventDefault();
+
+            if (!isInvestigated() || !isCodeComplete()) {
+                reflectionMessage.textContent =
+                    'Finish terminal 3/3 and coding 9/9 first.';
+
+                return;
+            }
+
+            state.reflection = reflection.value.trim();
+
+            if (state.reflection.length < 40) {
+                reflectionMessage.textContent =
+                    'Write at least 40 characters about the defence.';
+
+                return;
+            }
+
+            state.reflectionSubmitted = true;
+
+            reflectionMessage.textContent =
+                'Reflection saved on this device.';
+
+            save();
+            render();
+        }
+    );
+
+    render();
+})();
+</script>
 
     <script>
         const editor = document.getElementById(
