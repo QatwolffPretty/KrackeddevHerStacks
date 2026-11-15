@@ -129,7 +129,45 @@
                 are contacted.
             </p>
         </section>
+        <!-- =========================================
+          INTERACTIVE TERMINAL
+        ========================================= -->
+        <section class="lab-section">
+            <div class="num">
+                02 / INVESTIGATION TERMINAL
+            </div>
+            <h2>INVESTIGATE THE LOGIN ATTEMPTS.</h2>
+            <p class="lab-muted">
+             Investigate a fictional authentication system
+             using simulated terminal commands.
+             Start by typing help.
+            </p>
 
+      <div class="cyber-terminal">
+        <div id="terminal-output" class="terminal-output" role="log" aria-live="polite">HEROPS CYBERLAB TERMINAL
+         Training environment initialized.
+
+         Type 'help' to view available commands.</div>
+
+        <form
+            id="terminal-form"
+            class="terminal-command"
+            autocomplete="off"
+        >
+            <span>$</span>
+
+            <input
+                id="terminal-input"
+                type="text"
+                placeholder="Type a command..."
+                aria-label="Terminal command"
+                spellcheck="false"
+                autocapitalize="off"
+                required
+            >
+        </form>
+    </div>
+</section>
         <section class="lab-section">
             <div class="num">
                 02 / CODE WORKSPACE
