@@ -1045,6 +1045,7 @@ function resetOnSuccess(
                 ].includes(command)) {
                     completed.add(command);
                 }
+                window.HerOpsPreview.markCommand(command);
 
                 if (completed.size === 3) {
                     print(
