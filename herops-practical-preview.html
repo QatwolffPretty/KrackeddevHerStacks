@@ -907,7 +907,7 @@ function resetOnSuccess(
                     frame.contentWindow.postMessage({
                         kind: 'run',
                         id,
-                        source: editor.value
+                        source: submittedCode
                     }, '*');
                 },
                 { once: true }
