@@ -1044,8 +1044,9 @@ function resetOnSuccess(
                     'simulate login'
                 ].includes(command)) {
                     completed.add(command);
+                    window.HerOpsPreview.markCommand(command);
                 }
-                window.HerOpsPreview.markCommand(command);
+                
 
                 if (completed.size === 3) {
                     print(
