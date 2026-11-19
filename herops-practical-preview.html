@@ -892,7 +892,11 @@ function resetOnSuccess(
                         `expected ${row.expected}, ` +
                         `got ${row.actual}`
                     ).join('\n');
-
+                window.HerOpsPreview.recordTests(
+                    passed,
+                    rows.length,
+                    submittedCode
+                );
                 cleanup();
             }
 
