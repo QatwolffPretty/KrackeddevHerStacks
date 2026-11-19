@@ -995,8 +995,9 @@ function resetOnSuccess(
             ].join('\n')
         };
 
-        const completed = new Set();
-
+        const completed = new Set(
+            window.HerOpsPreview.getCommands()
+        );
         function print(message) {
             output.textContent += '\n\n' + message;
 
