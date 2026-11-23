@@ -1000,6 +1000,18 @@ async function loadProfile() {
   if (typeof loadRoleBadge === 'function') {
     await loadRoleBadge();
   }
+  currentAvatarPath = data?.avatar_path || null;
+  
+  try {
+    await loadMemberAvatar(currentAvatarPath);
+  } catch (error) {
+    console.warn('Unable to display avatar:', error);
+    feedback(
+      'avatar-feedback',
+      'Profile photo could not be loaded.',
+      true
+    );
+  }
 }
 
 $('profile-form').onsubmit = async (event) => {
