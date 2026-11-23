@@ -1109,7 +1109,39 @@ $('profile-form').onsubmit = async (event) => {
 };
 
       async function loadHistory(){const box=$('history');const {data,error}=await supabase.from('activity_completions').select('activity_id,status,submitted_at').eq('user_id',user.id).order('submitted_at',{ascending:false});if(error){box.textContent='Submission history unavailable until database permissions are configured.';$('member-submissions').textContent='—';return}const items=data||[];$('member-submissions').textContent=items.length;box.replaceChildren();if(!items.length){box.textContent='No submissions yet.';return}for(const item of items){const line=document.createElement('div');line.className='history-item';const left=document.createElement('span');left.textContent='Activity '+item.activity_id.slice(0,8)+'…';const right=document.createElement('span');right.className='status-pill';right.textContent=item.status||'pending';line.append(left,right);box.append(line)}}
-      async function loadXp(){const {data,error}=await supabase.from('xp_transactions').select('points').eq('user_id',user.id);$('member-xp').textContent=error?'—':(data||[]).reduce((sum,x)=>sum+Number(x.points||0),0)}
+async function loadXp() {
+  const { data, error } = await supabase
+    .from('xp_transactions')
+    .select('points')
+    .eq('user_id', user.id);
+
+  if (error) {
+    $('member-xp').textContent = '—';
+
+    $('identity-rank').textContent =
+      'RANK UNAVAILABLE';
+
+    $('identity-next').textContent =
+      'XP DATA UNAVAILABLE';
+
+    return;
+  }
+
+  const total = (data || []).reduce(
+    (sum, item) =>
+      sum + Number(item.points || 0),
+    0
+  );
+
+  $('member-xp').textContent =
+    total.toLocaleString('en-MY');
+
+  // Connect XP to automatic rank system
+  if (typeof updateMemberRank === 'function') {
+    updateMemberRank(total);
+  }
+}
+
       $('logout').onclick=async()=>{try{const {error}=await supabase.auth.signOut();if(error)throw error;user=null;notice('');await refresh()}catch(e){notice('Sign out failed: '+e.message)}};supabase.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});refresh();</script><script type="module">import {supabase} from './supabase-client.js';const button=document.getElementById('google-signin');button?.addEventListener('click',async()=>{const output=document.getElementById('google-error');button.disabled=true;output.textContent='Connecting to Google…';try{const redirectTo=new URL('account.html',window.location.href).href;const {error}=await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo}});if(error)throw error;}catch(e){output.textContent='Google login unavailable: '+e.message;button.disabled=false;}});
       </script>
     <script type="module" src="./member-dashboard.js"></script>
