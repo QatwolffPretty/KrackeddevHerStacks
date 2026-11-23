@@ -943,74 +943,92 @@ $('forgot-password').addEventListener(
 // ========================================
 
 $('password-recovery-form').addEventListener(
-    'submit',
-    async (event) => {
-        event.preventDefault();
+  'submit',
+  async (event) => {
+    event.preventDefault();
 
-        const password = $('new-password').value;
-        const confirmation = $('confirm-password').value;
-        const button = $('save-new-password');
-        const output = $('password-recovery-feedback');
+    const password = $('new-password').value;
+    const confirmation =
+      $('confirm-password').value;
 
-        if (password !== confirmation) {
-            output.textContent =
-                'Passwords do not match.';
-            return;
-        }
+    const button = $('save-new-password');
+    const output =
+      $('password-recovery-feedback');
 
-        if (password.length < 8) {
-            output.textContent =
-                'Use at least 8 characters.';
-            return;
-        }
-
-        button.disabled = true;
-        output.textContent = 'Updating password...';
-
-        try {
-            const { error } =
-                await supabase.auth.updateUser({
-                    password
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            // End the temporary recovery session.
-            const { error: signOutError } =
-                await supabase.auth.signOut();
-
-            if (signOutError) {
-                throw signOutError;
-            }
-
-            isRecovering = false;
-
-            window.history.replaceState(
-                null,
-                '',
-                window.location.pathname
-            );
-
-            await refresh();
-
-            setMode('login');
-
-            feedback(
-                'auth-feedback',
-                'Password updated successfully. ' +
-                'Sign in with your new password.'
-            );
-        } catch (error) {
-            output.textContent =
-                'Unable to finish password reset: ' +
-                error.message;
-        } finally {
-            button.disabled = false;
-        }
+    if (password !== confirmation) {
+      output.textContent =
+        'Passwords do not match.';
+      return;
     }
+
+    if (password.length < 8) {
+      output.textContent =
+        'Use at least 8 characters.';
+      return;
+    }
+
+    button.disabled = true;
+    output.textContent =
+      'Verifying recovery session...';
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+
+      if (sessionError) throw sessionError;
+
+      if (!isRecovering || !sessionData?.session) {
+        throw new Error(
+          'Recovery session missing or expired. ' +
+          'Request a new password reset link.'
+        );
+      }
+
+      const {
+        data: verified,
+        error: verifyError
+      } = await supabase.auth.getUser();
+
+      if (verifyError || !verified?.user) {
+        throw verifyError ||
+          new Error('Recovery session is invalid.');
+      }
+
+      output.textContent = 'Saving new password...';
+
+      const { error: updateError } =
+        await supabase.auth.updateUser({
+          password: password
+        });
+
+      if (updateError) throw updateError;
+
+      // Password update succeeded.
+      isRecovering = false;
+
+      window.history.replaceState(
+        null,
+        '',
+        window.location.pathname
+      );
+
+      output.textContent =
+        'Password updated successfully.';
+
+      // The verified recovery session is now
+      // authenticated. Continue into the account.
+      await refresh();
+
+    } catch (error) {
+      output.textContent =
+        'PASSWORD RESET FAILED: ' +
+        error.message;
+    } finally {
+      button.disabled = false;
+    }
+  }
 );
+
 
 // ========================================
 // DETECT PASSWORD RECOVERY LINK
