@@ -200,7 +200,34 @@
     font-size: 24px;
   }
 }
+      /* HERSTACKS / AVATAR UPLOAD */
 
+.member-identity-avatar {
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.member-identity-avatar.has-photo {
+  background-size: cover;
+  font-size: 0;
+}
+
+#avatar-file {
+  width: 100%;
+  font: 12px monospace;
+  color: #f5d5e6;
+}
+
+.avatar-upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#avatar-feedback {
+  overflow-wrap: anywhere;
+}
     </style>
   </head>
   <body>
