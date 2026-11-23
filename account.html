@@ -1119,12 +1119,24 @@ $('profile-form').onsubmit = async (event) => {
       interests.push('vibecoding');
     }
 
-    const values = {
-      display_name: displayName,
-      username,
-      bio,
-      state_code: stateCode
-    };
+
+const shareState =
+  $('share-state-on-map').checked;
+
+if (shareState && !stateCode) {
+  throw new Error(
+    'Select your state before enabling map sharing.'
+  );
+}
+
+const values = {
+  display_name: displayName,
+  username,
+  bio,
+  state_code: stateCode,
+  share_state_on_map: shareState
+};
+
 
     const { data: existing, error: readError } =
       await supabase
