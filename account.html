@@ -984,8 +984,22 @@ async function loadProfile() {
   $('interest-herops').checked =
     interests.includes('herops');
 
-  $('interest-vibecoding').checked =
+    $('interest-vibecoding').checked =
     interests.includes('vibecoding');
+
+  // Refresh member identity card
+  if (typeof renderIdentity === 'function') {
+    renderIdentity(
+      data?.display_name,
+      data?.username,
+      interests
+    );
+  }
+
+  // Check actual admin/member role
+  if (typeof loadRoleBadge === 'function') {
+    await loadRoleBadge();
+  }
 }
 
 $('profile-form').onsubmit = async (event) => {
