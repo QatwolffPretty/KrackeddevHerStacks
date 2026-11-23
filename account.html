@@ -1033,6 +1033,9 @@ async function loadProfile() {
   $('profile-state').value =
     data?.state_code || '';
 
+  $('share-state-on-map').checked =
+  data?.share_state_on_map === true;
+
   const interests = Array.isArray(
     user.user_metadata?.herstacks_learning_interests
   )
