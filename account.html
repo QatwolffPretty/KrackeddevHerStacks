@@ -1163,6 +1163,123 @@ async function loadXp() {
     updateMemberRank(total);
   }
 }
+      
+/* ==========================================
+   HERSTACKS / MEMBER IDENTITY & RANK SYSTEM
+========================================== */
+
+const HERSTACKS_RANKS = [
+  { name: 'INITIATE', min: 0 },
+  { name: 'EXPLORER', min: 100 },
+  { name: 'BUILDER', min: 250 },
+  { name: 'CONTRIBUTOR', min: 500 },
+  { name: 'OPERATOR', min: 1000 },
+  { name: 'SPECIALIST', min: 2000 },
+  { name: 'ARCHITECT', min: 4000 },
+  { name: 'VANGUARD', min: 8000 }
+];
+
+// ------------------------------------------
+// DISPLAY MEMBER IDENTITY
+// ------------------------------------------
+
+function renderIdentity(displayName, username, interests) {
+  const name =
+    displayName?.trim() ||
+    user?.email?.split('@')[0] ||
+    'Member';
+
+  $('identity-name').textContent = name;
+
+  $('identity-handle').textContent =
+    username ? `@${username}` : 'USERNAME NOT SET';
+
+  const initials = name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map(part => part.charAt(0))
+    .join('')
+    .toUpperCase();
+
+  $('identity-avatar').textContent = initials || 'KD';
+
+  const paths = [];
+
+  if (interests.includes('herops')) {
+    paths.push('CYBERSECURITY');
+  }
+
+  if (interests.includes('vibecoding')) {
+    paths.push('VIBE CODING');
+  }
+
+  $('identity-paths').textContent =
+    paths.length
+      ? `LEARNING PATHS / ${paths.join(' + ')}`
+      : 'NO LEARNING PATH SELECTED';
+}
+
+// ------------------------------------------
+// ADMIN / MEMBER ROLE
+// ------------------------------------------
+
+async function loadRoleBadge() {
+  try {
+    const [community, programme] = await Promise.all([
+      supabase.rpc('is_herstacks_admin'),
+      supabase.rpc('is_herstacks_payment_admin')
+    ]);
+
+    const isAdmin =
+      community.data === true ||
+      programme.data === true;
+
+    if (isAdmin) {
+      $('identity-role').textContent = 'ADMIN';
+      return;
+    }
+
+    if (community.error || programme.error) {
+      $('identity-role').textContent =
+        'ROLE UNAVAILABLE';
+      return;
+    }
+
+    $('identity-role').textContent = 'MEMBER';
+
+  } catch (error) {
+    console.error('Role verification failed:', error);
+
+    $('identity-role').textContent =
+      'ROLE UNAVAILABLE';
+  }
+}
+
+// ------------------------------------------
+// AUTOMATIC XP RANK
+// ------------------------------------------
+
+function updateMemberRank(totalXp) {
+  const xp = Math.max(0, Number(totalXp) || 0);
+
+  let index = 0;
+
+  for (let i = 0; i < HERSTACKS_RANKS.length; i++) {
+    if (xp >= HERSTACKS_RANKS[i].min) {
+      index = i;
+    }
+  }
+
+  const rank = HERSTACKS_RANKS[index];
+  const nextRank = HERSTACKS_RANKS[index + 1];
+
+  $('identity-rank').textContent =
+    `${rank.name} / LVL ${String(index + 1).padStart(2, '0')}`;
+
+  $('identity-next').textContent = nextRank
+    ? `${(nextRank.min - xp).toLocaleString('en-MY')} XP TO ${nextRank.name}`
+    : 'MAXIMUM RANK ACHIEVED';
+}
 
       $('logout').onclick=async()=>{try{const {error}=await supabase.auth.signOut();if(error)throw error;user=null;notice('');await refresh()}catch(e){notice('Sign out failed: '+e.message)}};supabase.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});refresh();</script><script type="module">import {supabase} from './supabase-client.js';const button=document.getElementById('google-signin');button?.addEventListener('click',async()=>{const output=document.getElementById('google-error');button.disabled=true;output.textContent='Connecting to Google…';try{const redirectTo=new URL('account.html',window.location.href).href;const {error}=await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo}});if(error)throw error;}catch(e){output.textContent='Google login unavailable: '+e.message;button.disabled=false;}});
       </script>
