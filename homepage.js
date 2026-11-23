@@ -262,3 +262,81 @@ function animateMemberCount(element, target) {
 }
 
 loadMemberCount();
+
+/* ==========================================
+   HERSTACKS / LIVE MALAYSIA STATE NETWORK
+   Privacy-safe aggregated statistics
+========================================== */
+
+async function loadStateNetwork() {
+  const overlay = document.querySelector(
+    '.malaysia-network-overlay'
+  );
+
+  const caption = document.querySelector(
+    '.malaysia-hero-visual .visual-caption'
+  );
+
+  if (!overlay || !caption) return;
+
+  // Hide old decorative dots.
+  // Only verified state-based markers may appear.
+  overlay.hidden = true;
+  overlay.style.display = 'none';
+
+  caption.textContent =
+    'CHECKING COMMUNITY STATE NETWORK...';
+
+  try {
+    const { data, error } = await supabase.rpc(
+      'get_herstacks_state_distribution'
+    );
+
+    if (error) throw error;
+
+    if (!Array.isArray(data)) {
+      throw new Error(
+        'Invalid state distribution response.'
+      );
+    }
+
+    // The database already filters for
+    // opted-in states with 3+ members.
+    const states = data.filter((row) => {
+      return (
+        typeof row.state_code === 'string' &&
+        Number.isSafeInteger(Number(row.member_count)) &&
+        Number(row.member_count) >= 3
+      );
+    });
+
+    if (states.length === 0) {
+      caption.textContent =
+        'NO PUBLIC STATE SIGNALS YET / ' +
+        'MINIMUM 3 OPTED-IN MEMBERS PER STATE';
+
+      return;
+    }
+
+    // Store validated state codes for the
+    // geographic marker rendering step.
+    overlay.dataset.activeStates = states
+      .map((row) => row.state_code)
+      .join(',');
+
+    caption.textContent =
+      `STATE NETWORK DATA READY / ` +
+      `${states.length} ELIGIBLE STATE(S)`;
+
+  } catch (error) {
+    console.error(
+      'HerStacks state network error:',
+      error
+    );
+
+    caption.textContent =
+      'STATE NETWORK DATA TEMPORARILY UNAVAILABLE';
+  }
+}
+
+loadStateNetwork();
