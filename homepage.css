@@ -1777,9 +1777,9 @@ h2 span {
 
 .member-stats-layout {
   display: grid;
-  grid-template-columns: 1fr 0.9fr;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: 90px;
+  gap: 0;
 }
 
 .member-stats-copy h2 {
