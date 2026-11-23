@@ -133,6 +133,74 @@
   width: auto;
   accent-color: var(--pink);
 }
+      
+/* HERSTACKS / MEMBER IDENTITY */
+
+.member-identity {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.member-identity-avatar {
+  display: grid;
+  place-items: center;
+  width: 90px;
+  height: 90px;
+  background: #24121e;
+  border: 1px solid var(--pink);
+  color: var(--pink);
+  font: 800 30px monospace;
+}
+
+.member-identity-info {
+  min-width: 0;
+}
+
+.member-identity-info h2 {
+  margin: 10px 0 4px;
+  overflow-wrap: anywhere;
+}
+
+#identity-handle {
+  margin: 0 0 18px;
+  font: 13px monospace;
+}
+
+.member-identity-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.member-identity-badges span {
+  padding: 7px 10px;
+  border: 1px solid #684057;
+  color: #f08cbc;
+  font: 700 11px monospace;
+}
+
+#identity-paths,
+#identity-next {
+  display: block;
+  font: 11px/1.8 monospace;
+}
+
+@media (max-width: 480px) {
+  .member-identity {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .member-identity-avatar {
+    width: 72px;
+    height: 72px;
+    font-size: 24px;
+  }
+}
+
     </style>
   </head>
   <body>
