@@ -1025,20 +1025,90 @@ supabase.auth.onAuthStateChange((event) => {
         }, 0);
     }
 });
-      async function 
-        refresh(){
-          if (isRecovering) {
+
+async function refresh() {
+  // Password recovery must never redirect to admin.
+  if (isRecovering) {
     $('auth').classList.add('hidden');
     $('member').classList.add('hidden');
 
     $('password-recovery').classList.remove('hidden');
-
     return;
+  }
+
+  $('password-recovery').classList.add('hidden');
+
+  try {
+    const { data, error } =
+      await supabase.auth.getUser();
+
+    if (error) throw error;
+
+    user = data?.user || null;
+
+    $('auth').classList.toggle(
+      'hidden',
+      Boolean(user)
+    );
+
+    $('member').classList.toggle(
+      'hidden',
+      !user
+    );
+
+    if (!user) return;
+
+    // Admin can explicitly open personal settings.
+    const params = new URLSearchParams(
+      window.location.search
+    );
+
+    const editingProfile =
+      params.get('view') === 'profile';
+
+    if (!editingProfile) {
+      // This is the role currently required
+      // by the existing Admin Console entry gate.
+      const { data: isAdmin, error: roleError } =
+        await supabase.rpc(
+          'is_herstacks_payment_admin'
+        );
+
+      if (roleError) {
+        console.warn(
+          'Admin role check failed:',
+          roleError
+        );
+      }
+
+      if (!roleError && isAdmin === true) {
+        window.location.replace(
+          new URL(
+            './herstacks-admin.html',
+            window.location.href
+          ).href
+        );
+        return;
+      }
+    }
+
+    $('member-email').textContent =
+      user.email || 'Member';
+
+    await Promise.all([
+      loadProfile(),
+      loadHistory(),
+      loadXp()
+    ]);
+
+  } catch (error) {
+    notice(
+      'Unable to verify your session: ' +
+      error.message
+    );
+  }
 }
 
-$('password-recovery').classList.add('hidden');
-          try{
-            const {data,error}=await supabase.auth.getUser();if(error)throw error;user=data.user;$('auth').classList.toggle('hidden',!!user);$('member').classList.toggle('hidden',!user);if(!user)return;$('member-email').textContent=user.email||'Member';await Promise.all([loadProfile(),loadHistory(),loadXp()])}catch(e){notice('Unable to verify your session: '+e.message)}}
 
 async function loadProfile() {
   const { data, error } = await supabase
