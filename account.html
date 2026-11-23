@@ -1027,18 +1027,73 @@ supabase.auth.onAuthStateChange((event) => {
 });
 
 async function refresh() {
-  // Password recovery must never redirect to admin.
-  if (isRecovering) {
-    $('auth').classList.add('hidden');
-    $('member').classList.add('hidden');
+  const authPanel = $('auth');
+  const memberPanel = $('member');
+  const recoveryPanel = $('password-recovery');
 
-    $('password-recovery').classList.remove('hidden');
+  if (isRecovering) {
+    authPanel.classList.add('hidden');
+    memberPanel.classList.add('hidden');
+    recoveryPanel.classList.remove('hidden');
+
+    const saveButton = $('save-new-password');
+    const output = $('password-recovery-feedback');
+
+    saveButton.disabled = true;
+    output.textContent = 'Verifying password reset link...';
+
+    try {
+      const { data, error } =
+        await supabase.auth.getSession();
+
+      if (error) throw error;
+
+      if (!data?.session) {
+        throw new Error(
+          'RESET LINK INVALID OR EXPIRED. ' +
+          'Please request a new password reset email ' +
+          'and open its link directly in Safari.'
+        );
+      }
+
+      const {
+        data: verified,
+        error: verifyError
+      } = await supabase.auth.getUser();
+
+      if (verifyError || !verified?.user) {
+        throw verifyError ||
+          new Error('Unable to verify recovery session.');
+      }
+
+      saveButton.disabled = false;
+      output.textContent =
+        'RESET LINK VERIFIED. You can set your new password.';
+
+    } catch (error) {
+      saveButton.disabled = true;
+      output.textContent = error.message;
+    }
+
     return;
   }
 
-  $('password-recovery').classList.add('hidden');
+  recoveryPanel.classList.add('hidden');
 
   try {
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
+
+    if (sessionError) throw sessionError;
+
+    if (!sessionData?.session) {
+      user = null;
+      authPanel.classList.remove('hidden');
+      memberPanel.classList.add('hidden');
+      notice('');
+      return;
+    }
+
     const { data, error } =
       await supabase.auth.getUser();
 
@@ -1046,19 +1101,11 @@ async function refresh() {
 
     user = data?.user || null;
 
-    $('auth').classList.toggle(
-      'hidden',
-      Boolean(user)
-    );
-
-    $('member').classList.toggle(
-      'hidden',
-      !user
-    );
+    authPanel.classList.toggle('hidden', !!user);
+    memberPanel.classList.toggle('hidden', !user);
 
     if (!user) return;
 
-    // Admin can explicitly open personal settings.
     const params = new URLSearchParams(
       window.location.search
     );
@@ -1067,18 +1114,13 @@ async function refresh() {
       params.get('view') === 'profile';
 
     if (!editingProfile) {
-      // This is the role currently required
-      // by the existing Admin Console entry gate.
       const { data: isAdmin, error: roleError } =
         await supabase.rpc(
           'is_herstacks_payment_admin'
         );
 
       if (roleError) {
-        console.warn(
-          'Admin role check failed:',
-          roleError
-        );
+        console.warn('Admin check:', roleError);
       }
 
       if (!roleError && isAdmin === true) {
@@ -1101,13 +1143,15 @@ async function refresh() {
       loadXp()
     ]);
 
+    notice('');
+
   } catch (error) {
     notice(
-      'Unable to verify your session: ' +
-      error.message
+      'Unable to load account: ' + error.message
     );
   }
 }
+
 
 
 async function loadProfile() {
