@@ -1091,6 +1091,14 @@ $('profile-form').onsubmit = async (event) => {
     }
 
     $('profile-username').value = username;
+    // Refresh identity after saving
+    if (typeof renderIdentity === 'function') {
+      renderIdentity(
+        displayName,
+        username,
+        interests
+      );
+    }
 
     feedback(
       'profile-feedback',
