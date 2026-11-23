@@ -1280,7 +1280,183 @@ function updateMemberRank(totalXp) {
     ? `${(nextRank.min - xp).toLocaleString('en-MY')} XP TO ${nextRank.name}`
     : 'MAXIMUM RANK ACHIEVED';
 }
+      
+// ==========================================
+// HERSTACKS / SECURE PROFILE PHOTO
+// ==========================================
 
+const AVATAR_BUCKET = 'herstacks-avatars';
+const AVATAR_MAX_SIZE = 2 * 1024 * 1024;
+
+let currentAvatarPath = null;
+
+const AVATAR_TYPES = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp'
+};
+
+async function loadMemberAvatar(path) {
+  const avatar = $('identity-avatar');
+
+  // Restore initials when no picture exists.
+  avatar.classList.remove('has-photo');
+  avatar.style.backgroundImage = '';
+
+  if (!path) return;
+
+  // Never display a path belonging to another member.
+  if (!user || !path.startsWith(user.id + '/')) {
+    throw new Error('Invalid profile photo path.');
+  }
+
+  const { data, error } = await supabase.storage
+    .from(AVATAR_BUCKET)
+    .createSignedUrl(path, 3600);
+
+  if (error) throw error;
+
+  avatar.style.backgroundImage =
+    `url("${data.signedUrl}")`;
+
+  avatar.classList.add('has-photo');
+}
+
+$('upload-avatar').addEventListener(
+  'click',
+  async () => {
+    const button = $('upload-avatar');
+    const file = $('avatar-file').files?.[0];
+
+    if (!user) {
+      feedback(
+        'avatar-feedback',
+        'Please sign in first.',
+        true
+      );
+      return;
+    }
+
+    if (!file) {
+      feedback(
+        'avatar-feedback',
+        'Choose a photo first.',
+        true
+      );
+      return;
+    }
+
+    const extension = AVATAR_TYPES[file.type];
+
+    if (!extension) {
+      feedback(
+        'avatar-feedback',
+        'Only JPG, PNG and WebP are supported.',
+        true
+      );
+      return;
+    }
+
+    if (file.size > AVATAR_MAX_SIZE || file.size === 0) {
+      feedback(
+        'avatar-feedback',
+        'Photo must be smaller than 2 MB.',
+        true
+      );
+      return;
+    }
+
+    button.disabled = true;
+
+    feedback(
+      'avatar-feedback',
+      'Uploading your photo...'
+    );
+
+    const path =
+      `${user.id}/${crypto.randomUUID()}.${extension}`;
+
+    const previousPath = currentAvatarPath;
+    const storage = supabase.storage.from(AVATAR_BUCKET);
+
+    try {
+      const { error: uploadError } =
+        await storage.upload(path, file, {
+          contentType: file.type,
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Save the private storage path in profiles.
+      const { data: updated, error: profileError } =
+        await supabase
+          .from('profiles')
+          .update({ avatar_path: path })
+          .eq('id', user.id)
+          .select('id')
+          .maybeSingle();
+
+      if (profileError || !updated) {
+        // Avoid leaving an unused file if saving fails.
+        await storage.remove([path]);
+
+        throw profileError || new Error(
+          'Save your profile details first.'
+        );
+      }
+
+      currentAvatarPath = path;
+
+      try {
+        await loadMemberAvatar(path);
+
+        feedback(
+          'avatar-feedback',
+          'Profile photo updated successfully.'
+        );
+      } catch (previewError) {
+        console.warn(
+          'Avatar preview unavailable:',
+          previewError
+        );
+
+        feedback(
+          'avatar-feedback',
+          'Photo saved. Refresh to retry the preview.'
+        );
+      }
+
+      $('avatar-file').value = '';
+
+      // Remove the old photo only after the new
+      // profile reference has been saved.
+      if (
+        previousPath &&
+        previousPath !== path &&
+        previousPath.startsWith(user.id + '/')
+      ) {
+        storage.remove([previousPath]).catch(
+          error => console.warn(
+            'Old photo cleanup failed:',
+            error
+          )
+        );
+      }
+
+    } catch (error) {
+      feedback(
+        'avatar-feedback',
+        'Upload failed: ' + error.message,
+        true
+      );
+
+    } finally {
+      button.disabled = false;
+    }
+  }
+);
       $('logout').onclick=async()=>{try{const {error}=await supabase.auth.signOut();if(error)throw error;user=null;notice('');await refresh()}catch(e){notice('Sign out failed: '+e.message)}};supabase.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});refresh();</script><script type="module">import {supabase} from './supabase-client.js';const button=document.getElementById('google-signin');button?.addEventListener('click',async()=>{const output=document.getElementById('google-error');button.disabled=true;output.textContent='Connecting to Google…';try{const redirectTo=new URL('account.html',window.location.href).href;const {error}=await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo}});if(error)throw error;}catch(e){output.textContent='Google login unavailable: '+e.message;button.disabled=false;}});
       </script>
     <script type="module" src="./member-dashboard.js"></script>
