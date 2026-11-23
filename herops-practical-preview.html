@@ -933,15 +933,16 @@ function resetOnSuccess(
             runTests
         );
 
+
         document.getElementById(
             'reset-code'
         ).addEventListener('click', () => {
             editor.value = starterCode;
-
+            
             output.textContent =
                 'Code reset. No tests run yet.';
+            window.HerOpsPreview.invalidateTests();
         });
-        window.HerOpsPreview.invalidateTests();
     </script>
     <script>
     // =========================================
