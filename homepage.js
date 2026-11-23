@@ -163,10 +163,22 @@
 import { supabase } from "./supabase-client.js";
 
 async function loadMemberCount() {
-  const counter = document.getElementById("member-count");
-  const status = document.getElementById("member-count-status");
+  // Two counters sharing one Supabase RPC request.
+  const counters = [
+    document.getElementById("member-count"),
+    document.getElementById("hero-member-count")
+  ].filter(Boolean);
 
-  if (!counter) return;
+  const statuses = [
+    document.getElementById("member-count-status"),
+    document.getElementById("hero-member-count-status")
+  ].filter(Boolean);
+
+  if (!counters.length) return;
+
+  counters.forEach((counter) => {
+    counter.setAttribute("aria-busy", "true");
+  });
 
   try {
     const { data, error } = await supabase.rpc(
@@ -180,36 +192,51 @@ async function loadMemberCount() {
     const total = Number(data);
 
     if (!Number.isSafeInteger(total) || total < 0) {
-      throw new Error("Invalid member count returned.");
+      throw new Error(
+        "Invalid member count returned."
+      );
     }
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    if (reducedMotion || total === 0) {
-      counter.textContent = total.toLocaleString("en-MY");
-    } else {
-      animateMemberCount(counter, total);
-    }
+    counters.forEach((counter) => {
+      if (reducedMotion || total === 0) {
+        counter.textContent =
+          total.toLocaleString("en-MY");
+      } else {
+        animateMemberCount(counter, total);
+      }
+    });
 
-    if (status) {
-      status.textContent = "REGISTERED ACCOUNTS / VERIFIED DATABASE";
-    }
+    statuses.forEach((status) => {
+      status.textContent =
+        "REGISTERED ACCOUNTS / LIVE DATABASE";
+    });
 
   } catch (error) {
-    console.error("Member counter error:", error);
+    console.error(
+      "HerStacks member counter error:",
+      error
+    );
 
-    counter.textContent = "—";
+    counters.forEach((counter) => {
+      counter.textContent = "—";
+    });
 
-    if (status) {
-      status.textContent = "MEMBER DATA TEMPORARILY UNAVAILABLE";
-    }
+    statuses.forEach((status) => {
+      status.textContent =
+        "MEMBER DATA TEMPORARILY UNAVAILABLE";
+    });
 
   } finally {
-    counter.setAttribute("aria-busy", "false");
+    counters.forEach((counter) => {
+      counter.setAttribute("aria-busy", "false");
+    });
   }
 }
+
 
 function animateMemberCount(element, target) {
   const duration = 1400;
