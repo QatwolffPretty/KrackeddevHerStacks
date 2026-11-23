@@ -2201,3 +2201,76 @@ h2 span {
         opacity: .5;
     }
 }
+
+/* ==========================================
+   HERSTACKS / LIVE STATE SIGNALS
+========================================== */
+
+/* Remove previously decorative markers
+   and connecting lines. */
+
+.malaysia-network-overlay {
+  background: none;
+  background-image: none;
+}
+
+.malaysia-network-overlay::before,
+.malaysia-network-overlay::after {
+  content: none;
+  background: none;
+  animation: none;
+}
+
+.malaysia-network-overlay[hidden] {
+  display: none !important;
+}
+
+/* Markers align with original SVG viewBox. */
+
+.malaysia-live-markers {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.malaysia-live-dot {
+  fill: #ff65b8;
+  stroke: #100b10;
+  stroke-width: 2;
+}
+
+.malaysia-live-ring {
+  fill: none;
+  stroke: #ff65b8;
+  stroke-width: 2;
+  opacity: .7;
+
+  transform-box: fill-box;
+  transform-origin: center;
+
+  animation:
+    herstacksStatePulse 3.5s ease-out infinite;
+}
+
+@keyframes herstacksStatePulse {
+  0% {
+    transform: scale(.65);
+    opacity: .8;
+  }
+
+  75%, 100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .malaysia-live-ring {
+    animation: none;
+    transform: none;
+    opacity: .55;
+  }
+}
