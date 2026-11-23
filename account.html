@@ -416,20 +416,28 @@
       >
     </div>
 
-    <div class="field">
-      <label for="profile-username">USERNAME</label>
-      <input
-        placeholder="kitten"
-        autocapitalize="off"
-        autocomplete="off"
-        spellcheck="false"
-        required
-        >
-      <small class="muted">
-        3–24 characters. Lowercase letters are enough.
-        Numbers and underscores are optional.
-      </small>
-    </div>
+<div class="field">
+  <label for="profile-username">USERNAME</label>
+
+  <input
+    id="profile-username"
+    type="text"
+    maxlength="24"
+    minlength="3"
+    pattern="[a-z][a-z0-9_]{2,23}"
+    placeholder="kitten"
+    autocapitalize="off"
+    autocomplete="off"
+    spellcheck="false"
+    required
+  >
+
+  <small class="muted">
+    3–24 characters. Lowercase letters are enough.
+    Numbers and underscores are optional.
+  </small>
+</div>
+
 
     <div class="field">
       <label for="bio">SHORT BIO</label>
