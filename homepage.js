@@ -340,3 +340,101 @@ async function loadStateNetwork() {
 }
 
 loadStateNetwork();
+
+/* ==========================================
+   HERSTACKS / REAL STATE MARKERS
+   Coordinates derived from original SVG
+   viewBox: 0 0 915 400
+========================================== */
+
+const HERSTACKS_STATE_POINTS = {
+  JOHOR: [228.2, 317.1],
+  KEDAH: [55.7, 102.8],
+  KELANTAN: [149.1, 125.5],
+  MELAKA: [165.6, 303.5],
+  NEGERI_SEMBILAN: [161.0, 272.4],
+  PAHANG: [193.6, 228.1],
+  PERAK: [95.0, 160.8],
+  PERLIS: [49.0, 63.9],
+  PULAU_PINANG: [55.6, 129.2],
+  SABAH: [788.7, 105.9],
+  SARAWAK: [519.1, 268.4],
+  SELANGOR: [113.9, 250.1],
+  TERENGGANU: [202.7, 156.5],
+  KUALA_LUMPUR: [131.3, 255.7],
+  LABUAN: [668.2, 130.6],
+  PUTRAJAYA: [131.7, 267.1]
+};
+
+function renderEligibleStateMarkers(overlay, states) {
+  const namespace = 'http://www.w3.org/2000/svg';
+
+  const svg = document.createElementNS(
+    namespace,
+    'svg'
+  );
+
+  svg.setAttribute('viewBox', '0 0 915 400');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svg.setAttribute('class', 'malaysia-live-markers');
+  svg.setAttribute('aria-hidden', 'true');
+
+  let rendered = 0;
+
+  for (const state of states) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        HERSTACKS_STATE_POINTS,
+        state.state_code
+      )
+    ) {
+      continue;
+    }
+
+    const [x, y] =
+      HERSTACKS_STATE_POINTS[state.state_code];
+
+    const group = document.createElementNS(
+      namespace,
+      'g'
+    );
+
+    const pulse = document.createElementNS(
+      namespace,
+      'circle'
+    );
+
+    pulse.setAttribute('cx', String(x));
+    pulse.setAttribute('cy', String(y));
+    pulse.setAttribute('r', '13');
+    pulse.setAttribute('class', 'malaysia-live-ring');
+
+    pulse.style.animationDelay =
+      `${rendered * -0.45}s`;
+
+    const dot = document.createElementNS(
+      namespace,
+      'circle'
+    );
+
+    dot.setAttribute('cx', String(x));
+    dot.setAttribute('cy', String(y));
+    dot.setAttribute('r', '7');
+    dot.setAttribute('class', 'malaysia-live-dot');
+
+    group.append(pulse, dot);
+    svg.append(group);
+
+    rendered++;
+  }
+
+  overlay.replaceChildren();
+
+  if (rendered > 0) {
+    overlay.append(svg);
+    overlay.hidden = false;
+    overlay.style.removeProperty('display');
+  }
+
+  return rendered;
+}
