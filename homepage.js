@@ -324,9 +324,13 @@ async function loadStateNetwork() {
       .map((row) => row.state_code)
       .join(',');
 
-    caption.textContent =
-      `STATE NETWORK DATA READY / ` +
-      `${states.length} ELIGIBLE STATE(S)`;
+    const renderedStates =
+  renderEligibleStateMarkers(overlay, states);
+
+caption.textContent =
+  `ACTIVE STATE SIGNALS / ` +
+  `${renderedStates} ELIGIBLE STATE(S) / ` +
+  `MINIMUM 3 OPTED-IN MEMBERS PER STATE`;
 
   } catch (error) {
     console.error(
