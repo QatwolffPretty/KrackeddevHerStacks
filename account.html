@@ -1010,7 +1010,7 @@ $('password-recovery').classList.add('hidden');
 async function loadProfile() {
   const { data, error } = await supabase
     .from('profiles')
-    .select('display_name,bio,username,state_code,avatar_path')
+    .select('display_name,bio,username,state_code,avatar_path,share_state_on_map')
     .eq('id', user.id)
     .maybeSingle();
 
