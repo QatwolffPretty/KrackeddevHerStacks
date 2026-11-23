@@ -188,21 +188,119 @@
           </div>
         </div>
         <div class="two-col">
-          <section class="panel">
-            <h2>My profile</h2>
-            <form id="profile-form">
-              <div class="field">
-                <label for="display-name">Display name</label>
-                <input id="display-name" maxlength="80" autocomplete="nickname">
-              </div>
-              <div class="field">
-                <label for="bio">Short bio</label>
-                <textarea id="bio" maxlength="500"></textarea>
-              </div>
-              <button class="btn" type="submit" id="save-profile">SAVE PROFILE</button>
-              <p id="profile-feedback" class="feedback" role="status"></p>
-            </form>
-          </section>
+          
+<section class="panel">
+  <div class="kicker">MEMBER / SETTINGS</div>
+  <h2>PROFILE SETTINGS.</h2>
+
+  <p class="muted small">
+    Manage your community identity and learning paths.
+  </p>
+
+  <form id="profile-form">
+
+    <div class="field">
+      <label for="display-name">DISPLAY NAME</label>
+      <input
+        id="display-name"
+        maxlength="80"
+        autocomplete="nickname"
+        required
+      >
+    </div>
+
+    <div class="field">
+      <label for="profile-username">USERNAME</label>
+      <input
+        id="profile-username"
+        maxlength="24"
+        pattern="[a-z][a-z0-9_]{2,23}"
+        placeholder="your_username"
+        autocapitalize="off"
+        autocomplete="off"
+        spellcheck="false"
+        required
+      >
+      <small class="muted">
+        3–24 characters. Lowercase letters, numbers
+        and underscores. Must start with a letter.
+      </small>
+    </div>
+
+    <div class="field">
+      <label for="bio">SHORT BIO</label>
+      <textarea
+        id="bio"
+        maxlength="500"
+        placeholder="Tell the community about yourself..."
+      ></textarea>
+    </div>
+
+    <div class="field">
+      <label for="profile-state">
+        STATE / FEDERAL TERRITORY (OPTIONAL)
+      </label>
+
+      <select id="profile-state">
+        <option value="">Prefer not to share</option>
+        <option value="JOHOR">Johor</option>
+        <option value="KEDAH">Kedah</option>
+        <option value="KELANTAN">Kelantan</option>
+        <option value="MELAKA">Melaka</option>
+        <option value="NEGERI_SEMBILAN">Negeri Sembilan</option>
+        <option value="PAHANG">Pahang</option>
+        <option value="PERAK">Perak</option>
+        <option value="PERLIS">Perlis</option>
+        <option value="PULAU_PINANG">Pulau Pinang</option>
+        <option value="SABAH">Sabah</option>
+        <option value="SARAWAK">Sarawak</option>
+        <option value="SELANGOR">Selangor</option>
+        <option value="TERENGGANU">Terengganu</option>
+        <option value="KUALA_LUMPUR">Kuala Lumpur</option>
+        <option value="LABUAN">Labuan</option>
+        <option value="PUTRAJAYA">Putrajaya</option>
+      </select>
+
+      <small class="muted">
+        Optional. Intended for future aggregated
+        community map statistics.
+      </small>
+    </div>
+
+    <fieldset class="profile-tracks">
+      <legend>MY LEARNING PATHS</legend>
+
+      <label>
+        <input id="interest-herops" type="checkbox">
+        CYBERSECURITY / HEROPS
+      </label>
+
+      <label>
+        <input id="interest-vibecoding" type="checkbox">
+        VIBE CODING / DEVELOPMENT
+      </label>
+
+      <small class="muted">
+        You can select both learning paths.
+      </small>
+    </fieldset>
+
+    <button
+      class="btn"
+      type="submit"
+      id="save-profile"
+    >
+      SAVE PROFILE
+    </button>
+
+    <p
+      id="profile-feedback"
+      class="feedback"
+      role="status"
+    ></p>
+  </form>
+</section>
+
           <section class="panel">
             <h2>My activity</h2>
             <div id="history" class="small">Loading your submissions…</div>
