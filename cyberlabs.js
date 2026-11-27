@@ -656,3 +656,369 @@ async function initialize() {
   }
 }
 initialize();
+
+/* ==========================================
+   HEROPS / INTERACTIVE CAREER EXPLORER
+   HCR-03
+========================================== */
+
+const careerSection = $('herops-career');
+const careerSearch = $('herops-career-filter');
+const careerRoles = $('herops-career-roles');
+const careerRoadmap = $('herops-career-roadmap');
+const careerModules = $('herops-career-modules');
+const careerSave = $('herops-career-save');
+const careerFeedback = $('herops-career-feedback');
+const careerStatus = $('herops-career-status');
+
+let careerUser = null;
+let selectedCareerId = null;
+let savedCareerId = null;
+
+// Career preferences are separate from:
+// - member learning interests
+// - verified lesson progress
+// - XP and certificates
+// - staff/admin permissions
+
+const CAREER_METADATA_KEY =
+  'herstacks_herops_career_goal';
+
+function careerElement(tag, text, className = '') {
+  const node = document.createElement(tag);
+
+  node.textContent = text;
+  node.className = className;
+
+  return node;
+}
+
+function getCareer(id) {
+  return HEROPS_CAREERS.find(
+    role => role.id === id
+  ) || null;
+}
+
+// ==========================================
+// RENDER SEARCHABLE CAREER CARDS
+// ==========================================
+
+function renderCareerCards() {
+  const query = careerSearch.value
+    .trim()
+    .toLowerCase();
+
+  careerRoles.replaceChildren();
+
+  const matches = HEROPS_CAREERS.filter(role => {
+    const searchable = [
+      role.title,
+      role.category,
+      role.summary,
+      role.level,
+      ...role.tools,
+      ...role.progression
+    ].join(' ').toLowerCase();
+
+    return searchable.includes(query);
+  });
+
+  if (!matches.length) {
+    careerRoles.append(
+      careerElement(
+        'p',
+        'No matching cybersecurity careers found.',
+        'lab-muted'
+      )
+    );
+    return;
+  }
+
+  for (const role of matches) {
+    const card = careerElement(
+      'article',
+      '',
+      'lab-path herops-career-card'
+    );
+
+    const category = careerElement(
+      'div',
+      role.category,
+      'lab-kicker'
+    );
+
+    const title = careerElement(
+      'h3',
+      role.title
+    );
+
+    const summary = careerElement(
+      'p',
+      role.summary
+    );
+
+    const level = careerElement(
+      'p',
+      'LEVEL / ' + role.level,
+      'lab-muted'
+    );
+
+    const button = careerElement(
+      'button',
+      'EXPLORE ROADMAP →',
+      'lab-button lab-button-outline'
+    );
+
+    button.type = 'button';
+
+    button.setAttribute(
+      'aria-pressed',
+      String(selectedCareerId === role.id)
+    );
+
+    if (selectedCareerId === role.id) {
+      card.classList.add('is-selected');
+    }
+
+    button.addEventListener('click', () => {
+      selectCareer(role.id);
+    });
+
+    card.append(
+      category,
+      title,
+      summary,
+      level,
+      button
+    );
+
+    careerRoles.append(card);
+  }
+}
+
+// ==========================================
+// SELECT ROLE / BUILD PERSONALISED ROADMAP
+// ==========================================
+
+function selectCareer(id, scroll = true) {
+  const role = getCareer(id);
+
+  if (!role) return;
+
+  selectedCareerId = role.id;
+
+  $('herops-selected-role').textContent =
+    role.title;
+
+  $('herops-career-summary').textContent =
+    role.summary;
+
+  $('herops-career-level').textContent =
+    'CAREER PROGRESSION / ' +
+    role.progression.join(' → ');
+
+  $('herops-career-tools').textContent =
+    'TOOLS / ' + role.tools.join(' · ');
+
+  careerModules.replaceChildren();
+
+  role.modules.forEach((entry, index) => {
+    const module =
+      typeof entry === 'string'
+        ? CAREER_FOUNDATIONS[entry]
+        : entry;
+
+    if (!module) return;
+
+    const available =
+      module.status === 'available' &&
+      Boolean(module.href);
+
+    const row = careerElement(
+      'article',
+      '',
+      'lab-module herops-roadmap-step'
+    );
+
+    const number = careerElement(
+      'span',
+      String(index + 1).padStart(2, '0'),
+      'lab-module-number'
+    );
+
+    const details = document.createElement('div');
+
+    const title = careerElement(
+      'strong',
+      module.title,
+      'lab-module-title'
+    );
+
+    const description = careerElement(
+      'p',
+      module.skills,
+      'lab-muted'
+    );
+
+    details.append(title, description);
+
+    if (available) {
+      const link = careerElement(
+        'a',
+        'OPEN EXISTING MODULE →',
+        'herops-module-link'
+      );
+
+      link.href = module.href;
+      details.append(link);
+    }
+
+    const state = careerElement(
+      'span',
+      available ? 'AVAILABLE' : 'PLANNED',
+      'lab-module-status'
+    );
+
+    row.append(number, details, state);
+    careerModules.append(row);
+  });
+
+  careerRoadmap.hidden = false;
+
+  careerSave.disabled =
+    !careerUser ||
+    savedCareerId === role.id;
+
+  careerSave.textContent =
+    savedCareerId === role.id
+      ? 'CAREER GOAL SAVED ✓'
+      : 'SAVE MY CAREER GOAL →';
+
+  careerFeedback.textContent =
+    savedCareerId === role.id
+      ? 'This is your saved career goal.'
+      : careerUser
+        ? 'Save this role to your member account.'
+        : 'Sign in to save your career preference.';
+
+  renderCareerCards();
+
+  if (scroll) {
+    careerRoadmap.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+}
+
+// ==========================================
+// SAVE CAREER PREFERENCE TO SUPABASE AUTH
+// ==========================================
+
+careerSave.addEventListener('click', async () => {
+  if (!careerUser || !selectedCareerId) {
+    careerFeedback.textContent =
+      'Please sign in before saving.';
+    return;
+  }
+
+  if (!getCareer(selectedCareerId)) return;
+
+  careerSave.disabled = true;
+
+  careerFeedback.textContent =
+    'Saving career preference...';
+
+  try {
+    const { data, error } =
+      await supabase.auth.updateUser({
+        data: {
+          [CAREER_METADATA_KEY]: selectedCareerId
+        }
+      });
+
+    if (error) throw error;
+
+    if (data?.user) {
+      careerUser = data.user;
+    }
+
+    savedCareerId = selectedCareerId;
+
+    careerFeedback.textContent =
+      'CAREER GOAL SAVED SUCCESSFULLY.';
+
+    careerSave.textContent =
+      'CAREER GOAL SAVED ✓';
+
+    renderCareerCards();
+
+  } catch (error) {
+    careerFeedback.textContent =
+      'Unable to save career goal: ' +
+      error.message;
+
+    careerSave.disabled = false;
+  }
+});
+
+// ==========================================
+// SEARCH / FILTER
+// ==========================================
+
+careerSearch.addEventListener(
+  'input',
+  renderCareerCards
+);
+
+// ==========================================
+// INITIALISE CAREER EXPLORER
+// ==========================================
+
+async function initializeCareerExplorer() {
+  careerSection.hidden = false;
+
+  renderCareerCards();
+
+  careerStatus.textContent =
+    '12 CAREER PATHWAYS / EXPLORE YOUR OPTIONS';
+
+  try {
+    const { data, error } =
+      await supabase.auth.getUser();
+
+    // Public browsing is allowed.
+    // Only saving requires an account.
+    if (error || !data?.user) {
+      careerStatus.textContent =
+        'PUBLIC ROADMAPS / SIGN IN TO SAVE YOUR GOAL';
+      return;
+    }
+
+    careerUser = data.user;
+
+    const storedId =
+      careerUser.user_metadata?.[
+        CAREER_METADATA_KEY
+      ];
+
+    if (typeof storedId === 'string') {
+      const existing = getCareer(storedId);
+
+      if (existing) {
+        savedCareerId = existing.id;
+        selectCareer(existing.id, false);
+      }
+    }
+
+    careerStatus.textContent =
+      'SIGNED IN / SELECT OR UPDATE YOUR CAREER GOAL';
+
+  } catch (error) {
+    careerStatus.textContent =
+      'Career roadmaps available. ' +
+      'Sign in to save your preference.';
+  }
+}
+
+initializeCareerExplorer();
