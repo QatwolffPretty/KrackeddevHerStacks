@@ -79,6 +79,107 @@
       <div class="lab-stats"><div><span>ENROLLED TRACKS</span><strong id="lab-track-count">0</strong></div><div><span>AVAILABLE MODULES</span><strong id="lab-module-count">0</strong></div><div><span>LEARNING PROGRESS</span><strong>COMING SOON</strong></div></div>
       <div id="lab-paths" class="lab-paths"></div>
     </section>
+    
+<!-- =========================================
+     HEROPS / CYBERSECURITY CAREER EXPLORER
+========================================= -->
+
+<section id="herops-career" class="lab-section herops-career" aria-labelledby="herops-career-title" hidden>
+  <div class="lab-section-heading">
+    <div>
+      <div class="num">
+        HEROPS / CAREER SPECIALISATION
+      </div>
+
+      <h2 id="herops-career-title">
+        CHOOSE YOUR CYBERSECURITY CAREER.
+      </h2>
+    </div>
+  </div>
+
+  <p class="lab-muted">
+    Explore cybersecurity job positions,
+    understand their required skills,
+    and follow a personalised learning roadmap.
+  </p>
+
+  <div class="herops-career-search">
+    <label for="herops-career-filter">
+      SEARCH CAREER POSITIONS
+    </label>
+
+    <input id="herops-career-filter" type="search" placeholder="Ethical Hacker, SOC Analyst, Cloud Security..." autocomplete="off">
+  </div>
+
+  <!-- Career cards generated from cyberlabs.js -->
+
+  <div
+    id="herops-career-roles"
+    class="herops-career-grid"
+    aria-label="Available cybersecurity career paths"
+  ></div>
+
+  <!-- Personalised roadmap -->
+
+  <section
+    id="herops-career-roadmap"
+    class="herops-career-roadmap"
+    aria-labelledby="herops-selected-role"
+    hidden
+  >
+    <div class="num">
+      YOUR PERSONALISED CAREER ROADMAP
+    </div>
+
+    <h3 id="herops-selected-role">
+      SELECT A CAREER
+    </h3>
+
+    <p
+      id="herops-career-summary"
+      class="lab-muted"
+    ></p>
+
+    <div class="herops-career-meta">
+      <span id="herops-career-level"></span>
+      <span id="herops-career-tools"></span>
+    </div>
+
+    <div
+      id="herops-career-modules"
+      class="herops-career-modules"
+    ></div>
+
+    <div class="lab-form-actions">
+      <button
+        type="button"
+        id="herops-career-save"
+        class="lab-button"
+      >
+        SAVE MY CAREER GOAL →
+      </button>
+
+      <a
+        href="./herops.html"
+        class="lab-button lab-button-outline"
+      >
+        HEROPS FUNDAMENTALS →
+      </a>
+    </div>
+
+    <p
+      id="herops-career-feedback"
+      class="lab-muted"
+      role="status"
+    ></p>
+  </section>
+
+  <p
+    id="herops-career-status"
+    class="lab-muted"
+    role="status"
+  ></p>
+</section>
 
     <section class="lab-section" aria-labelledby="lab-about-title"><div class="num">HOW IT WORKS</div><h2 id="lab-about-title">LEARN → PRACTICE → APPLY</h2><p class="lab-muted">Each track follows an ordered curriculum. Lessons, quizzes, practical exercises and verified progress tracking will be released in stages. Your existing member account remains the same.</p></section>
   </main>
